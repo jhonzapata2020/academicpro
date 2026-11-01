@@ -13,8 +13,19 @@ from backend.services.nequi_receipt_scanner import nequi_scanner
 
 router = APIRouter(prefix="/api/credits", tags=["Billetera y Pagos"])
 
-VOUCHERS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "vouchers"))
-os.makedirs(VOUCHERS_DIR, exist_ok=True)
+def _get_storage_path(folder_name: str) -> str:
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        path = os.path.join("/tmp/academicpro_storage", folder_name)
+    else:
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", folder_name))
+    try:
+        os.makedirs(path, exist_ok=True)
+    except (OSError, PermissionError):
+        path = os.path.join("/tmp/academicpro_storage", folder_name)
+        os.makedirs(path, exist_ok=True)
+    return path
+
+VOUCHERS_DIR = _get_storage_path("vouchers")
 
 class CheckoutRequest(BaseModel):
     package_id: str = "STANDARD_PACK_5"

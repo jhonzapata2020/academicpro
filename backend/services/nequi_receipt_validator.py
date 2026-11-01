@@ -27,8 +27,24 @@ AUTHORIZED_DESTINATIONS = [
     os.getenv("NEQUI_AUTHORIZED_PHONE", "3207105618").replace(" ", "").replace("-", "")
 ]
 MAX_VOUCHER_AGE_HOURS = 48
-DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "financial_audit.db"))
-os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+
+def get_db_path() -> str:
+    """Retorna la ruta adecuada para la base de datos de auditoría (local o /tmp para Vercel)."""
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        tmp_dir = "/tmp/academicpro_storage"
+        os.makedirs(tmp_dir, exist_ok=True)
+        return os.path.join(tmp_dir, "financial_audit.db")
+
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage"))
+    try:
+        os.makedirs(base_dir, exist_ok=True)
+        return os.path.join(base_dir, "financial_audit.db")
+    except (OSError, PermissionError):
+        tmp_dir = "/tmp/academicpro_storage"
+        os.makedirs(tmp_dir, exist_ok=True)
+        return os.path.join(tmp_dir, "financial_audit.db")
+
+DB_PATH = get_db_path()
 
 # =========================================================================
 # 1. MODELOS DE DATOS PYDANTIC (ESQUEMA ESTRICTO)
@@ -60,31 +76,34 @@ class ReceiptValidationResponse(BaseModel):
 # 2. BASE DE DATOS TRANSACCIONAL (SQLITE ANTI-REPLAY)
 # =========================================================================
 def init_audit_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS receipt_audit_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            voucher_hash TEXT UNIQUE NOT NULL,
-            reference_code TEXT,
-            rrn TEXT,
-            platform TEXT,
-            amount REAL,
-            destination TEXT,
-            voucher_date TEXT,
-            support_type TEXT,
-            confidence REAL,
-            status TEXT NOT NULL, -- APPROVED, REJECTED, MANUAL_REVIEW
-            credits_granted INTEGER DEFAULT 0,
-            reasons TEXT,
-            raw_payload TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    cursor.execute("CREATE INDEX IF NOT EXISTS idx_voucher_hash ON receipt_audit_log(voucher_hash)")
-    cursor.execute("CREATE INDEX IF NOT EXISTS idx_reference_code ON receipt_audit_log(reference_code)")
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS receipt_audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                voucher_hash TEXT UNIQUE NOT NULL,
+                reference_code TEXT,
+                rrn TEXT,
+                platform TEXT,
+                amount REAL,
+                destination TEXT,
+                voucher_date TEXT,
+                support_type TEXT,
+                confidence REAL,
+                status TEXT NOT NULL, -- APPROVED, REJECTED, MANUAL_REVIEW
+                credits_granted INTEGER DEFAULT 0,
+                reasons TEXT,
+                raw_payload TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_voucher_hash ON receipt_audit_log(voucher_hash)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_reference_code ON receipt_audit_log(reference_code)")
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print("Aviso: No se pudo inicializar SQLite local para auditoría financiera:", e)
 
 init_audit_db()
 

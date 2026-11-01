@@ -12,10 +12,20 @@ from backend.services.supabase_client import supabase_service
 
 router = APIRouter(prefix="/api/generation", tags=["Generación Académica"])
 
-UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "uploads"))
-OUTPUT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "outputs"))
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+def _get_storage_path(folder_name: str) -> str:
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        path = os.path.join("/tmp/academicpro_storage", folder_name)
+    else:
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", folder_name))
+    try:
+        os.makedirs(path, exist_ok=True)
+    except (OSError, PermissionError):
+        path = os.path.join("/tmp/academicpro_storage", folder_name)
+        os.makedirs(path, exist_ok=True)
+    return path
+
+UPLOAD_DIR = _get_storage_path("uploads")
+OUTPUT_DIR = _get_storage_path("outputs")
 
 @router.post("/create-from-guide")
 async def create_from_guide(
