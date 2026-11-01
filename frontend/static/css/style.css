@@ -228,9 +228,11 @@ body.wompi-theme {
   border-color: var(--wompi-sky-border);
 }
 
-.wompi-card-radio.card-blue:hover {
+.wompi-card-radio.card-blue:hover,
+.wompi-card-radio.card-blue.active {
   border-color: var(--wompi-sky-active);
   background: var(--wompi-sky-bg);
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.14);
 }
 
 .wompi-card-radio.card-lime {
@@ -241,6 +243,7 @@ body.wompi-theme {
 .wompi-card-radio.card-lime.active {
   border-color: var(--wompi-lime-active);
   background: var(--wompi-lime-bg);
+  box-shadow: 0 8px 24px rgba(101, 163, 13, 0.14);
 }
 
 .card-radio-top {
@@ -288,6 +291,7 @@ body.wompi-theme {
   align-items: center;
   justify-content: center;
   background: #FFF;
+  transition: all 0.2s ease;
 }
 
 .radio-inner-dot {
@@ -295,10 +299,23 @@ body.wompi-theme {
   height: 9px;
   border-radius: 50%;
   background: transparent;
+  transition: all 0.2s ease;
 }
 
+/* Estado activo para tarjeta azul (Creación) */
+.wompi-card-radio.card-blue.active .wompi-radio-circle {
+  border-color: var(--wompi-sky-active);
+  background: #FFF;
+}
+
+.wompi-card-radio.card-blue.active .radio-inner-dot {
+  background: var(--wompi-sky-active);
+}
+
+/* Estado activo para tarjeta lima (Corrección) */
 .wompi-card-radio.card-lime.active .wompi-radio-circle {
   border-color: var(--wompi-lime-active);
+  background: #FFF;
 }
 
 .wompi-card-radio.card-lime.active .radio-inner-dot {

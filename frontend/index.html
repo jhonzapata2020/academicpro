@@ -74,13 +74,13 @@
       <div class="wompi-selection-grid compact">
 
         <!-- TARJETA 1: CREAR DESDE GUÍA (BORDE AZUL CIELO) -->
-        <div class="wompi-card-radio card-blue" id="card-creacion">
+        <div class="wompi-card-radio card-blue" id="card-creacion" onclick="selectSelectionCard('creacion')">
           <div class="card-radio-top">
             <div>
               <h3 class="card-radio-title">Crear desde Guía</h3>
               <span class="card-radio-sub">Trabajo completo desde cero</span>
             </div>
-            <div class="wompi-radio-circle">
+            <div class="wompi-radio-circle" id="radio-circle-creacion">
               <div class="radio-inner-dot"></div>
             </div>
           </div>
@@ -105,14 +105,14 @@
 
           <!-- BOTÓN DE ACCIÓN DIRECTO SOLICITADO -->
           <div class="card-cta-row">
-            <button class="btn-card-upload blue" onclick="triggerFileUpload('creacion')">
+            <button class="btn-card-upload blue" onclick="event.stopPropagation(); triggerFileUpload('creacion')">
               <span>📂 Cargar Guía o Rúbrica (PDF/DOCX)</span>
             </button>
           </div>
         </div>
 
         <!-- TARJETA 2: AUDITAR Y CORREGIR (BORDE VERDE LIMA/NEÓN) -->
-        <div class="wompi-card-radio card-lime active" id="card-correccion">
+        <div class="wompi-card-radio card-lime active" id="card-correccion" onclick="selectSelectionCard('correccion')">
           <div class="card-radio-top">
             <div>
               <div class="title-with-pill">
@@ -121,7 +121,7 @@
               </div>
               <span class="card-radio-sub">Manuscrito o tesis existente</span>
             </div>
-            <div class="wompi-radio-circle active">
+            <div class="wompi-radio-circle active" id="radio-circle-correccion">
               <div class="radio-inner-dot"></div>
             </div>
           </div>
@@ -146,7 +146,7 @@
 
           <!-- BOTÓN DE ACCIÓN DIRECTO SOLICITADO -->
           <div class="card-cta-row">
-            <button class="btn-card-upload lime" onclick="triggerFileUpload('correccion')">
+            <button class="btn-card-upload lime" onclick="event.stopPropagation(); triggerFileUpload('correccion')">
               <span>📄 Cargar Borrador de Tesis (.DOCX)</span>
             </button>
           </div>

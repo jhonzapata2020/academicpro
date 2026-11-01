@@ -21,10 +21,30 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================================================================
-   1. DISPARADOR DIRECTO DE CARGA DESDE LAS TARJETAS (ESTADO 1)
+   1. SELECCIÓN INTERACTIVA DE TARJETAS Y DISPARADOR DE CARGA (ESTADO 1)
    ========================================================================= */
-function triggerFileUpload(mode) {
+function selectSelectionCard(mode) {
   currentMode = mode;
+  const cardCreacion = document.getElementById("card-creacion");
+  const cardCorreccion = document.getElementById("card-correccion");
+  const radioCreacion = document.getElementById("radio-circle-creacion");
+  const radioCorreccion = document.getElementById("radio-circle-correccion");
+
+  if (mode === "creacion") {
+    if (cardCreacion) cardCreacion.classList.add("active");
+    if (radioCreacion) radioCreacion.classList.add("active");
+    if (cardCorreccion) cardCorreccion.classList.remove("active");
+    if (radioCorreccion) radioCorreccion.classList.remove("active");
+  } else {
+    if (cardCorreccion) cardCorreccion.classList.add("active");
+    if (radioCorreccion) radioCorreccion.classList.add("active");
+    if (cardCreacion) cardCreacion.classList.remove("active");
+    if (radioCreacion) radioCreacion.classList.remove("active");
+  }
+}
+
+function triggerFileUpload(mode) {
+  selectSelectionCard(mode);
   if (mode === "creacion") {
     const input = document.getElementById("file-guide-direct");
     if (input) input.click();
