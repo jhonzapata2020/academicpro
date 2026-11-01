@@ -55,6 +55,17 @@ if os.path.exists(STATIC_DIR):
 async def health_check():
     return {"status": "healthy", "service": "AcademicPro AI API", "version": "1.0.0"}
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def serve_favicon():
+    fav_file = os.path.join(FRONTEND_DIR, "favicon.ico")
+    if os.path.exists(fav_file):
+        return FileResponse(fav_file)
+    fav_static = os.path.join(STATIC_DIR, "images", "favicon.ico")
+    if os.path.exists(fav_static):
+        return FileResponse(fav_static)
+    from fastapi import Response
+    return Response(status_code=204)
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
     index_file = os.path.join(FRONTEND_DIR, "index.html")
