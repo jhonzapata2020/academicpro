@@ -1,0 +1,193 @@
+{
+  "name": "AcademicPro - Pipeline de Pagos Nequi, Soporte Personalizado y Despacho WhatsApp",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": "academicpro-events-inbound"
+      },
+      "metadata": {
+        "designer": {
+          "x": 100,
+          "y": 250,
+          "name": "Webhook Receptor de Eventos AcademicPro"
+        },
+        "description": "Recibe eventos POST desde FastAPI: nuevo_comprobante_nequi, solicitud_personalizada_whatsapp o pago_aprobado_wompi"
+      }
+    },
+    {
+      "id": 2,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "metadata": {
+        "designer": {
+          "x": 350,
+          "y": 250,
+          "name": "Enrutador de Flujo por Tipo de Evento"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "module": "http:ActionMakeRequest",
+      "version": 1,
+      "parameters": {
+        "url": "https://api.academicpro.co/api/nequi/verify-vision",
+        "method": "POST",
+        "headers": [
+          { "name": "Content-Type", "value": "application/json" },
+          { "name": "X-Security-Token", "value": "{{env.SECRET_API_KEY}}" }
+        ],
+        "body": "{\n  \"voucher_url\": \"{{1.payload.comprobante_url}}\",\n  \"expected_destination\": \"3207105618\",\n  \"expected_amount\": {{1.payload.monto}}\n}"
+      },
+      "filter": {
+        "name": "Solo Comprobantes Nequi",
+        "conditions": [
+          [
+            {
+              "a": "{{1.tipo_evento}}",
+              "o": "text:equal",
+              "b": "nuevo_comprobante_nequi"
+            }
+          ]
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 600,
+          "y": 100,
+          "name": "Ruta A: Validación Visión Artificial OCR"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "module": "telegram:ActionSendMessage",
+      "version": 1,
+      "parameters": {
+        "chat_id": "{{env.TELEGRAM_JHON_CHAT_ID}}",
+        "text": "🔔 *NUEVO PAGO NEQUI RECIBIDO*\n\n👤 *Estudiante:* {{1.payload.nombre}}\n📱 *Celular:* {{1.payload.celular}}\n💰 *Monto:* ${{1.payload.monto}} COP\n🔢 *Ref/RRN:* {{3.data.rrn}}\n📑 *Trabajo:* {{1.payload.archivo_id}} ({{1.payload.paginas}} págs)\n🎯 *Destino:* {{3.data.numero_destino}} (Esperado: 3207105618)\n\n¿Deseas dar de alta este trabajo y liberar la descarga?",
+        "parse_mode": "Markdown",
+        "reply_markup": {
+          "inline_keyboard": [
+            [
+              {
+                "text": "✅ APROBAR Y LIBERAR .DOCX",
+                "callback_data": "APPROVE_{{1.payload.archivo_id}}_{{1.payload.monto}}"
+              },
+              {
+                "text": "❌ RECHAZAR",
+                "callback_data": "REJECT_{{1.payload.archivo_id}}"
+              }
+            ]
+          ]
+        }
+      },
+      "metadata": {
+        "designer": {
+          "x": 850,
+          "y": 100,
+          "name": "Notificación WhatsApp / Telegram a Jhon con Botones"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "module": "http:ActionMakeRequest",
+      "version": 1,
+      "parameters": {
+        "url": "{{env.SUPABASE_URL}}/rest/v1/pagos_nequi",
+        "method": "POST",
+        "headers": [
+          { "name": "apikey", "value": "{{env.SUPABASE_ANON_KEY}}" },
+          { "name": "Authorization", "value": "Bearer {{env.SUPABASE_SERVICE_ROLE_KEY}}" },
+          { "name": "Content-Type", "value": "application/json" },
+          { "name": "Prefer", "value": "return=representation" }
+        ],
+        "body": "{\n  \"trabajo_id\": \"{{1.payload.archivo_id}}\",\n  \"monto\": {{1.payload.monto}},\n  \"rrn_aprobacion\": \"{{3.data.rrn}}\",\n  \"comprobante_url\": \"{{1.payload.comprobante_url}}\",\n  \"estado_verificacion\": \"APROBADO_MANUAL\"\n}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 1100,
+          "y": 100,
+          "name": "Actualizar Estado en Supabase (Aprobado)"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "module": "http:ActionMakeRequest",
+      "version": 1,
+      "parameters": {
+        "url": "{{env.WHATSAPP_API_URL}}/v1/messages",
+        "method": "POST",
+        "headers": [
+          { "name": "Authorization", "value": "Bearer {{env.WHATSAPP_API_TOKEN}}" },
+          { "name": "Content-Type", "value": "application/json" }
+        ],
+        "body": "{\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{1.payload.celular}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"¡Hola {{1.payload.nombre}}! 👋 Tu documento Word (.docx) ya está disponible para descarga en AcademicPro, completamente maquetado con normas APA 7 y tabla de contenido automática. Cualquier ajuste con tu tutor, me puedes escribir directamente a este chat con Jhon Zapata (+57 320 710 5618). ¡Muchos éxitos en tu entrega! 🎓\"\n  }\n}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 1350,
+          "y": 100,
+          "name": "Notificación de Entrega Automática al Estudiante"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "module": "http:ActionMakeRequest",
+      "version": 1,
+      "parameters": {
+        "url": "{{env.SUPABASE_URL}}/rest/v1/usuarios",
+        "method": "POST",
+        "headers": [
+          { "name": "apikey", "value": "{{env.SUPABASE_ANON_KEY}}" },
+          { "name": "Authorization", "value": "Bearer {{env.SUPABASE_SERVICE_ROLE_KEY}}" },
+          { "name": "Content-Type", "value": "application/json" },
+          { "name": "Prefer", "value": "resolution=merge-duplicates" }
+        ],
+        "body": "{\n  \"nombre\": \"{{1.payload.nombre}}\",\n  \"celular\": \"{{1.payload.celular}}\",\n  \"email\": \"{{1.payload.email}}\",\n  \"creditos_disponibles\": 0\n}"
+      },
+      "filter": {
+        "name": "Ruta B: Asesoría Directa 1 a 1",
+        "conditions": [
+          [
+            {
+              "a": "{{1.tipo_evento}}",
+              "o": "text:equal",
+              "b": "solicitud_personalizada_whatsapp"
+            }
+          ]
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 600,
+          "y": 380,
+          "name": "Ruta B: Registrar Prospecto Tesis en Supabase"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "module": "telegram:ActionSendMessage",
+      "version": 1,
+      "parameters": {
+        "chat_id": "{{env.TELEGRAM_JHON_CHAT_ID}}",
+        "text": "💬 *SOLICITUD DE ASESORÍA PERSONALIZADA*\n\n👤 *Estudiante:* {{1.payload.nombre}}\n📱 *WhatsApp:* [Chatear con el estudiante](https://wa.me/{{1.payload.celular}})\n📑 *Documento:* {{1.payload.nombre_archivo}} ({{1.payload.paginas}} páginas)\n💡 *Instrucciones:* {{1.payload.instrucciones_tutor}}",
+        "parse_mode": "Markdown"
+      },
+      "metadata": {
+        "designer": {
+          "x": 850,
+          "y": 380,
+          "name": "Alerta Inmediata a Jhon para Contactar Estudiante"
+        }
+      }
+    }
+  ]
+}

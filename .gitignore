@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Caches and environments
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Databases and local test storage
+*.db
+*.sqlite3
+storage/uploads/*
+!storage/uploads/.gitkeep
+storage/outputs/*
+!storage/outputs/.gitkeep
+storage/vouchers/*
+!storage/vouchers/.gitkeep
+
+# IDEs and OS metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

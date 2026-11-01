@@ -1,0 +1,112 @@
+"""
+Router: Endpoints de Generación Académica (Modo 1 y Modo 3)
+"""
+
+import os
+import shutil
+import uuid
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse
+from backend.core.engine_generator import generate_document_core
+from backend.services.supabase_client import supabase_service
+
+router = APIRouter(prefix="/api/generation", tags=["Generación Académica"])
+
+UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "uploads"))
+OUTPUT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "outputs"))
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+@router.post("/create-from-guide")
+async def create_from_guide(
+    project_type: str = Form("standard"), # "standard" (1 crédito) o "macro_project" (Pase Proyecto Pro)
+    title: str = Form("Actividad Académica"),
+    student_name: str = Form("Estudiante"),
+    student_code: str = Form("1000000000"),
+    group_number: str = Form("Grupo_101"),
+    tutor_name: str = Form("Docente Tutor"),
+    institution: str = Form("UNAD"),
+    font_family: str = Form("Times New Roman"),
+    font_size: int = Form(12),
+    line_spacing: float = Form(1.5),
+    include_toc: bool = Form(False),
+    guide_file: UploadFile = File(None),
+    rubric_file: UploadFile = File(None),
+    template_file: UploadFile = File(None)
+):
+    user_id = "demo_user_1"
+    is_premium = (project_type == "macro_project")
+    cost = 1
+
+    # 1. Verificar y descontar créditos en Supabase
+    has_credits = supabase_service.deduct_credits(user_id=user_id, cost=cost, is_premium_project=is_premium)
+    if not has_credits:
+        raise HTTPException(
+            status_code=402,
+            detail="Saldo insuficiente de créditos. Por favor recarga tu saldo para continuar."
+        )
+
+    # 2. Guardar archivos subidos
+    task_id = str(uuid.uuid4())[:8]
+    template_path = None
+    if template_file and template_file.filename:
+        template_path = os.path.join(UPLOAD_DIR, f"{task_id}_{template_file.filename}")
+        with open(template_path, "wb") as f:
+            shutil.copyfileobj(template_file.file, f)
+
+    # 3. Compilar el documento Word oficial bajo APA 7
+    output_filename = f"Documento_Generado_{task_id}_{institution}_APA7.docx"
+    output_path = os.path.join(OUTPUT_DIR, output_filename)
+
+    generate_document_core(
+        project_type=project_type,
+        title=title,
+        student_name=student_name,
+        student_code=student_code,
+        group_number=group_number,
+        tutor_name=tutor_name,
+        institution=institution,
+        font_family=font_family,
+        font_size=font_size,
+        line_spacing=line_spacing,
+        include_toc=include_toc,
+        template_path=template_path,
+        output_path=output_path
+    )
+
+    # 4. Generar resumen pedagógico didáctico
+    summary = (
+        f"Se estructuró el documento '{title}' bajo el Instructivo Oficial APA 7 de {institution}. "
+        f"Portada en pág 1, Introducción en pág 2, Objetivos sin viñetas en pág 3 (pág. 20 UNAD), "
+        f"Desarrollo con citas teóricas, Conclusiones en penúltima hoja y Referencias con sangría francesa."
+    )
+
+    # Registrar en base de datos
+    supabase_service.log_document_task(user_id, {
+        "task_id": task_id,
+        "title": title,
+        "mode": "generator",
+        "output_filename": output_filename,
+        "summary": summary
+    })
+
+    current_credits = supabase_service.get_user_credits(user_id)
+
+    return {
+        "status": "success",
+        "task_id": task_id,
+        "download_url": f"/api/generation/download/{output_filename}",
+        "pedagogical_summary": summary,
+        "remaining_credits": current_credits
+    }
+
+@router.get("/download/{filename}")
+async def download_generated_file(filename: str):
+    file_path = os.path.join(OUTPUT_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Archivo no encontrado")
+    return FileResponse(
+        file_path,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename=filename
+    )

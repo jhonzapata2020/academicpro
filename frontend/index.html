@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AcademicPro | Asistencia Académica y Auditoría APA 7</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body class="wompi-theme viewport-fit">
+
+  <!-- TOP BAR OSCURA COMPACTA (54px) -->
+  <header class="wompi-header compact">
+    <div class="wompi-header-left">
+      <div class="wompi-logo-wrap" onclick="resetToInitialState()">
+        <span class="wompi-w-mark">W</span>
+        <span class="wompi-brand-title">Academic<span class="wompi-brand-bold">Pro</span></span>
+      </div>
+      <div class="wompi-breadcrumb-separator"></div>
+      <span class="wompi-screen-title" id="screen-breadcrumb">Activación y Maquetación Académica</span>
+    </div>
+
+    <div class="wompi-header-right">
+      <div class="wompi-credit-wallet">
+        <span class="wompi-wallet-icon">💳</span>
+        <span class="wompi-wallet-text"><strong id="credit-count">4</strong> Créditos</span>
+      </div>
+
+      <button class="wompi-btn-recharge" id="btn-open-recharge">
+        + Comprar Créditos ($10.000 c/u)
+      </button>
+
+      <div class="wompi-avatar-circle" title="Usuario activo">
+        <span>JZ</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BARRA DE CONFIANZA INSTITUCIONAL (HUMANO + TECNOLOGÍA) -->
+  <div class="academic-trust-strip">
+    <div class="trust-badge-text">
+      <span class="icon">🛡️</span>
+      <span>Asesoría académica profesional y desarrollo garantizado bajo Normas APA 7ma Ed.</span>
+    </div>
+    <a href="https://wa.me/573207105618?text=Hola%20Jhon,%20estoy%20en%20AcademicPro%20y%20tengo%20dudas%20puntuales%20sobre%20mi%20trabajo" target="_blank" class="trust-contact-link">
+      <span>Habla conmigo al WhatsApp o llámame para dudas puntuales:</span>
+      <strong>+57 320 710 5618</strong>
+    </a>
+  </div>
+
+  <!-- INPUTS DE ARCHIVOS NATIVOS OCULTOS -->
+  <input type="file" id="file-guide-direct" accept=".pdf,.docx,.doc" style="display:none;" />
+  <input type="file" id="file-thesis-direct" accept=".docx" style="display:none;" />
+  <input type="file" id="file-rubric-secondary" accept=".xlsx,.pdf,.docx,.pptx" style="display:none;" />
+
+  <!-- CONTENEDOR PRINCIPAL SIN SCROLL (VIEWPORT-HEIGHT LOCKED) -->
+  <main class="wompi-main-viewport">
+    
+    <!-- ============================================================== -->
+    <!-- ESTADO 1: VISTA INICIAL DE SELECCIÓN Y CARGA (ZERO SCROLL) -->
+    <!-- ============================================================== -->
+    <div class="wompi-viewport-card" id="view-state-1">
+
+      <div class="wompi-card-header compact">
+        <h1>¡Bienvenido a AcademicPro!</h1>
+        <p class="wompi-card-subtitle">
+          Selecciona <b>Crear desde Guía</b> si requieres la redacción integral de tu trabajo con bibliografía, o elige <b>Auditar y Corregir</b> si ya cuentas con tu manuscrito de tesis y requieres formato APA 7 y atención a las notas del jurado.
+        </p>
+      </div>
+
+      <!-- CUADRÍCULA DE 2 TARJETAS SELECCIÓN CON BORDES WOMPI Y BOTONES DIRECTOS -->
+      <div class="wompi-selection-grid compact">
+
+        <!-- TARJETA 1: CREAR DESDE GUÍA (BORDE AZUL CIELO) -->
+        <div class="wompi-card-radio card-blue" id="card-creacion">
+          <div class="card-radio-top">
+            <div>
+              <h3 class="card-radio-title">Crear desde Guía</h3>
+              <span class="card-radio-sub">Trabajo completo desde cero</span>
+            </div>
+            <div class="wompi-radio-circle">
+              <div class="radio-inner-dot"></div>
+            </div>
+          </div>
+
+          <div class="card-radio-requirements compact">
+            <span class="req-title">Debes contar con:</span>
+
+            <div class="req-item">
+              <div class="req-icon-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              </div>
+              <span class="req-text">Guía de actividades o rúbrica (PDF o Word).</span>
+            </div>
+
+            <div class="req-item">
+              <div class="req-icon-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              </div>
+              <span class="req-text">Preguntas orientadoras o lecturas requeridas.</span>
+            </div>
+          </div>
+
+          <!-- BOTÓN DE ACCIÓN DIRECTO SOLICITADO -->
+          <div class="card-cta-row">
+            <button class="btn-card-upload blue" onclick="triggerFileUpload('creacion')">
+              <span>📂 Cargar Guía o Rúbrica (PDF/DOCX)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TARJETA 2: AUDITAR Y CORREGIR (BORDE VERDE LIMA/NEÓN) -->
+        <div class="wompi-card-radio card-lime active" id="card-correccion">
+          <div class="card-radio-top">
+            <div>
+              <div class="title-with-pill">
+                <h3 class="card-radio-title">Auditar y Corregir</h3>
+                <span class="wompi-badge-save">AHORRA HASTA 45%</span>
+              </div>
+              <span class="card-radio-sub">Manuscrito o tesis existente</span>
+            </div>
+            <div class="wompi-radio-circle active">
+              <div class="radio-inner-dot"></div>
+            </div>
+          </div>
+
+          <div class="card-radio-requirements compact">
+            <span class="req-title">Debes contar con:</span>
+
+            <div class="req-item">
+              <div class="req-icon-box lime">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+              </div>
+              <span class="req-text">Documento borrador o tesis en Word (.docx).</span>
+            </div>
+
+            <div class="req-item">
+              <div class="req-icon-box lime">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </div>
+              <span class="req-text">Observaciones del jurado o notas del asesor.</span>
+            </div>
+          </div>
+
+          <!-- BOTÓN DE ACCIÓN DIRECTO SOLICITADO -->
+          <div class="card-cta-row">
+            <button class="btn-card-upload lime" onclick="triggerFileUpload('correccion')">
+              <span>📄 Cargar Borrador de Tesis (.DOCX)</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- ESTADO 2: CONFIGURACIÓN Y CONFIRMACIÓN (SE ACTIVA TRAS CARGA) -->
+    <!-- ============================================================== -->
+    <div class="wompi-viewport-card" id="view-state-2" style="display: none;">
+      
+      <!-- BARRA DE NAVEGACIÓN SUPERIOR DEL ESTADO 2 -->
+      <div class="state-2-top-bar">
+        <button class="btn-back-wompi" onclick="resetToInitialState()">
+          ← Volver / Cambiar Archivo
+        </button>
+        <div class="service-pill-active" id="active-service-pill">
+          Modo: Corrección y Auditoría APA 7
+        </div>
+      </div>
+
+      <!-- GRID INTERNO COMPACTO (ARCHIVO RESUMEN + INSTRUCCIONES) -->
+      <div class="state-2-grid">
+        
+        <!-- COLUMNA IZQUIERDA: RESUMEN DEL ARCHIVO CARGADO -->
+        <div class="file-summary-card">
+          <div class="f-summary-top">
+            <span class="f-big-icon" id="summary-file-icon">📄</span>
+            <div class="f-summary-meta">
+              <span class="f-type-tag" id="summary-service-tag">Documento de Tesis</span>
+              <h3 class="f-name-text" id="summary-file-name">tesis_grado_final.docx</h3>
+              <span class="f-size-text" id="summary-file-size">482 KB · Listo para procesar</span>
+            </div>
+          </div>
+
+          <div class="f-details-strip">
+            <div class="f-detail-box">
+              <span class="det-lbl">PÁGINAS REALES</span>
+              <span class="det-val" id="summary-pages-count">65</span>
+            </div>
+            <div class="f-detail-box">
+              <span class="det-lbl">FORMATO DETECTADO</span>
+              <span class="det-val" id="summary-format">Word (.docx)</span>
+            </div>
+          </div>
+
+          <!-- RÚBRICA OPCIONAL ADICIONAL -->
+          <div class="secondary-file-strip">
+            <button class="btn-add-secondary" onclick="document.getElementById('file-rubric-secondary').click()">
+              <span id="btn-secondary-label">📎 + Agregar Rúbrica o Notas del Jurado (.xlsx/.pdf)</span>
+            </button>
+          </div>
+
+          <!-- ACCIONES DE MUESTRA EFÍMERA Y CONTACTO PERSONALIZADO -->
+          <div class="preview-cta-strip" style="display: flex; gap: 8px; margin-top: 8px;">
+            <button class="btn-open-preview" type="button" onclick="openEphemeralViewer()" style="flex: 1; background: #0284C7; color: #FFF; border: none; padding: 7px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;">
+              <span>👁️ Ver Muestra Real APA 7 (Gratis)</span>
+            </button>
+            <button class="btn-ask-jhon" type="button" onclick="requestPersonalizedAssistance()" style="background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; padding: 7px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <span>💬 Hablar con Jhon</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: TEXTAREA DE INSTRUCCIONES DEL TUTOR -->
+        <div class="instructions-card-compact">
+          <div class="inst-compact-header">
+            <label for="tutor-instructions">
+              <strong>Instrucciones del Tutor o Cambios Solicitados:</strong>
+            </label>
+            <span class="inst-priority-chip">⚡ Procesamiento Prioritario</span>
+          </div>
+
+          <textarea 
+            id="tutor-instructions" 
+            class="textarea-compact"
+            placeholder="Escribe o pega aquí las observaciones textuales del jurado (ej: 'reducir el título a 15 palabras', 'la tabla de contenido no actualiza', 'falta justificación en tres dimensiones', 'corregir porcentajes diagnósticos'). El motor las procesará de forma prioritaria."
+          ></textarea>
+
+          <span class="inst-hint">💡 Puedes pegar fragmentos textuales de los correos y audios de tu asesor.</span>
+        </div>
+
+      </div>
+
+      <!-- BANNER DE COTIZACIÓN DINÁMICA INTEGRADA -->
+      <div class="wompi-quote-banner compact">
+        <div class="quote-col">
+          <span class="q-metric-label">PÁGINAS REALES</span>
+          <div class="q-metric-val">
+            <span class="q-val-num" id="q-pages">65</span>
+            <span class="q-val-unit">págs</span>
+          </div>
+        </div>
+
+        <div class="quote-col-sep"></div>
+
+        <div class="quote-col">
+          <span class="q-metric-label">CRÉDITOS REQUERIDOS</span>
+          <div class="q-metric-val">
+            <span class="q-val-num highlight" id="q-credits">2</span>
+            <span class="q-val-unit">créditos</span>
+          </div>
+        </div>
+
+        <div class="quote-col-sep"></div>
+
+        <div class="quote-col">
+          <span class="q-metric-label">TARIFA EQUIVALENTE</span>
+          <div class="q-metric-val">
+            <span class="q-val-num green" id="q-cost">$20.000 COP</span>
+            <span class="q-val-unit">($10.000 c/u)</span>
+          </div>
+        </div>
+
+        <div class="quote-col-sep"></div>
+
+        <div class="quote-col">
+          <span class="q-metric-label">TU SALDO DISPONIBLE</span>
+          <div class="q-metric-val">
+            <span class="q-val-num" id="q-user-balance">4</span>
+            <span class="q-val-unit">créditos</span>
+          </div>
+        </div>
+
+        <!-- BOTÓN DE INICIO DE PROCESAMIENTO -->
+        <div class="quote-col-btn">
+          <button class="wompi-btn-action" id="btn-process-doc" onclick="executeDocumentProcess()">
+            <span id="btn-process-text">🚀 Iniciar Procesamiento</span>
+            <span class="btn-cost-chip" id="btn-process-tag">2 Créditos</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ETIQUETA INFORMATIVA DE LA ESCALA DE TARIFAS -->
+      <div class="quote-scale-hint" style="font-size: 11px; color: #475569; text-align: center; margin-top: 6px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <span style="color: #0284C7;">ℹ️</span>
+        <span>Tareas regulares (hasta 30 págs): <strong>2 créditos ($20.000 COP)</strong> • Micro-ensayos (&lt;12 págs): <strong>1 crédito ($10.000 COP)</strong></span>
+      </div>
+
+      <!-- TARJETA COMPACTA DE COBRO POST-MUESTRA (SE ACTIVA AL CERRAR LA MUESTRA) -->
+      <div class="post-preview-card" id="post-preview-summary-card" style="display: none;">
+        <div class="post-preview-info">
+          <h4>✅ Trabajo Verificado con Rúbrica Institucional (<span id="post-preview-pages">65</span> páginas)</h4>
+          <p>Muestra revisada con éxito. Puedes descargar el trabajo completo con tu saldo de créditos o recargar con Nequi / Wompi.</p>
+        </div>
+        <div class="post-preview-actions">
+          <button class="wompi-btn-action" onclick="executeDocumentProcess()" style="padding: 8px 16px; font-size: 12px;">
+            🚀 Descargar Trabajo Completo
+          </button>
+          <button class="wompi-btn-recharge" onclick="openRechargeModal()" style="padding: 8px 14px; font-size: 12px;">
+            💳 Recargar Saldo
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- ESTADO 3: RESULTADOS Y DESCARGAS -->
+    <!-- ============================================================== -->
+    <div class="wompi-viewport-card" id="view-state-3" style="display: none;">
+      <div class="state-2-top-bar">
+        <button class="btn-back-wompi" onclick="resetToInitialState()">
+          ← Procesar Nuevo Documento
+        </button>
+        <span class="success-indicator-pill">✓ Completado con Normas APA 7</span>
+      </div>
+
+      <div class="results-layout-compact">
+        <div class="results-downloads-row">
+          <a href="#" class="btn-dl-wompi primary" id="link-download-docx" download>
+            <span class="dl-icon">📦</span>
+            <div>
+              <strong>Descargar Documento Final (.docx)</strong>
+              <small>Portada, Tabla de contenido, sangrías francesas y citas normalizadas.</small>
+            </div>
+            <span class="dl-chevron">⬇</span>
+          </a>
+
+          <a href="#" class="btn-dl-wompi secondary" id="link-download-excel" download style="display: none;">
+            <span class="dl-icon">📊</span>
+            <div>
+              <strong>Descargar Reporte de Ajustes (.xlsx)</strong>
+              <small>Matriz antes vs. después con justificación metodológica.</small>
+            </div>
+            <span class="dl-chevron">⬇</span>
+          </a>
+        </div>
+
+        <div class="results-pedagogical-box compact">
+          <span class="ped-tag">💡 GUÍA DIDÁCTICA DE SUSTENTACIÓN:</span>
+          <p id="pedagogical-text">...</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DUAL DE PAGOS (WOMPI + OCR NEQUI) -->
+  <div class="wompi-modal-overlay" id="modal-recharge" style="display: none;">
+    <div class="wompi-modal-card">
+      <div class="modal-card-header">
+        <div class="modal-header-brand">
+          <span class="wompi-modal-pill">Billetera de Créditos</span>
+          <h3>Recargar Créditos Académicos</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal">&times;</button>
+      </div>
+
+      <p class="modal-intro-text">
+        Tarifa fija institucional: <b>1 Crédito = $10.000 COP</b>. Recarga con tu cuenta de <b>Nequi, Bancolombia o PSE</b>:
+      </p>
+
+      <div class="modal-plans-list">
+        <div class="modal-plan-row" onclick="selectPlanQuote(2, 20000)">
+          <div class="plan-info">
+            <span class="plan-mini-tag">BÁSICO</span>
+            <h4>Paquete 2 Créditos (Hasta 75 páginas de corrección)</h4>
+            <p>Ideal para anteproyectos o tareas medianas.</p>
+          </div>
+          <span class="plan-price-num">$20.000 <small>COP</small></span>
+        </div>
+
+        <div class="modal-plan-row active" onclick="selectPlanQuote(5, 50000)">
+          <div class="plan-info">
+            <span class="plan-mini-tag lime">MÁS POPULAR</span>
+            <h4>Paquete 5 Créditos (Tesis Estándar o Todo el Semestre)</h4>
+            <p>Suficiente para auditar tu tesis completa o 5 tareas de curso.</p>
+          </div>
+          <span class="plan-price-num">$50.000 <small>COP</small></span>
+        </div>
+
+        <div class="modal-plan-row" onclick="selectPlanQuote(10, 100000)">
+          <div class="plan-info">
+            <span class="plan-mini-tag">TESIS MACRO</span>
+            <h4>Paquete 10 Créditos (Tesis de Posgrado > 140 págs)</h4>
+            <p>Para investigaciones extensas con reporte integral en Excel.</p>
+          </div>
+          <span class="plan-price-num">$100.000 <small>COP</small></span>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DIRECTA NEQUI -->
+      <div class="nequi-direct-card">
+        <div class="nequi-direct-header">
+          <span>📱 Transferencia Directa Nequi</span>
+          <span class="verified-tag">✔ Cuenta Oficial: 320 710 5618</span>
+        </div>
+
+        <div class="nequi-nums-row">
+          <div class="nequi-num-col">
+            <label>NÚMERO NEQUI:</label>
+            <div class="copy-field">
+              <strong id="nequi-number-text">320 710 5618</strong>
+              <button class="btn-copy-chip" onclick="copyNequiNumber()">Copiar</button>
+            </div>
+          </div>
+
+          <div class="nequi-num-col">
+            <label>VALOR SELECCIONADO:</label>
+            <div class="amount-val-display" id="nequi-amount-display">$50.000 COP</div>
+          </div>
+        </div>
+
+        <div class="nequi-upload-box">
+          <label><b>Subir Recibo o Comprobante Nequi (PDF, JPG, PNG) para Activación OCR:</b></label>
+          <div class="receipt-dropzone" id="drop-receipt">
+            <input type="file" id="file-nequi-receipt" accept=".pdf,.jpg,.jpeg,.png" />
+            <div class="dropzone-label-wrap">
+              <span>📎</span>
+              <span id="receipt-file-label">Arrastra aquí el comprobante de pago Nequi</span>
+            </div>
+          </div>
+          <button class="btn-verify-receipt-wompi" id="btn-scan-receipt" onclick="uploadAndVerifyReceipt()">
+            🔍 Escanear Recibo y Dar de Alta Automáticamente
+          </button>
+        </div>
+
+        <div class="nequi-whatsapp-row">
+          <span>¿Dudas con tu pago o soporte directo?</span>
+          <a href="https://wa.me/573207105618?text=Hola,%20acabo%20de%20hacer%20la%20transferencia%20en%20Nequi%20para%20AcademicPro" target="_blank" class="wompi-whatsapp-link">
+            💬 WhatsApp (320 710 5618)
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- VISOR DE MUESTRA EFÍMERA Y BLINDAJE ANTI-CAPTURA (MODAL CARTA) -->
+  <!-- ============================================================== -->
+  <div class="ephemeral-viewer-overlay" id="modal-ephemeral-viewer" style="display: none;">
+    <div class="ephemeral-sheet-wrapper" id="ephemeral-sheet-wrapper">
+      
+      <!-- CORTINA DE SEGURIDAD BLINDADA ANTI-CAPTURA (BLUR/VISIBILITY) -->
+      <div class="curtain-security-shield" id="curtain-security-shield">
+        <div class="curtain-icon">🔒</div>
+        <h3 class="curtain-title">VISTA PROTEGIDA CONTRA CAPTURA DE PANTALLA</h3>
+        <p class="curtain-desc">
+          Por derechos de autoría académica y protocolos de seguridad anti-plagio, la muestra efímera se oculta temporalmente. <b>Haz clic en esta ventana para reanudar la lectura.</b>
+        </p>
+      </div>
+
+      <!-- CONTROLES SUPERIORES -->
+      <div class="ephemeral-top-controls">
+        <span>📄 Muestra de Un Solo Uso · Normas APA 7ma Ed.</span>
+        <button class="btn-close-ephemeral" onclick="destroyAndCloseEphemeralViewer()">✕ Salir de la Muestra</button>
+      </div>
+
+      <!-- CONTENIDO DE LA HOJA CON MARCA DE AGUA -->
+      <div class="ephemeral-sheet-scroll" id="ephemeral-sheet-content">
+        <div class="ephemeral-watermark">VISTA PREVIA NO AUTORIZADA · ACADEMICPRO · ASESORÍA PERSONALIZADA</div>
+        <div id="ephemeral-sample-body">
+          <!-- Se inyecta dinámicamente y se purga de memoria al salir -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SPEED DIAL / FLOATING ACTION BUTTON (ESQUINA INFERIOR DERECHA) -->
+  <!-- ============================================================== -->
+  <div class="speed-dial-wrapper" id="speed-dial">
+    <div class="speed-dial-actions-list">
+      
+      <!-- ACCIÓN 1: CORREO ELECTRÓNICO (bg-slate-800) -->
+      <div class="speed-dial-item">
+        <span class="speed-dial-tooltip">Correo (triangelturbo@gmail.com)</span>
+        <a href="mailto:triangelturbo@gmail.com?subject=Consulta%20AcademicPro%20-%20Asesor%C3%ADa%20Acad%C3%A9mica" class="speed-dial-sub-btn mail" title="Enviar Correo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </a>
+      </div>
+
+      <!-- ACCIÓN 2: LLAMADA TELEFÓNICA (bg-blue-600) -->
+      <div class="speed-dial-item">
+        <span class="speed-dial-tooltip">Llamada (+57 320 710 5618)</span>
+        <a href="tel:+573207105618" class="speed-dial-sub-btn phone" title="Llamar directamente">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        </a>
+      </div>
+
+      <!-- ACCIÓN 3: WHATSAPP DIRECTO (bg-[#25D366]) -->
+      <div class="speed-dial-item">
+        <span class="speed-dial-tooltip">WhatsApp Directo</span>
+        <a id="speed-dial-wa-link" href="https://wa.me/573207105618?text=Hola%20Jhon,%20estoy%20en%20AcademicPro%20y%20deseo%20asesor%C3%ADa%20personalizada%20con%20mi%20trabajo" target="_blank" class="speed-dial-sub-btn wa" title="Chatear por WhatsApp">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- BOTÓN PRINCIPAL FAB (bg-emerald-600, 56px, audífonos -> X roja) -->
+    <button class="speed-dial-btn-main" id="speed-dial-trigger" title="Soporte y Asesoría Personalizada" onclick="toggleSpeedDial()">
+      <span class="speed-dial-icon-open">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+      </span>
+      <span class="speed-dial-icon-close">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </span>
+    </button>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
