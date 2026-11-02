@@ -15,21 +15,37 @@ WOMPI_EVENTS_SECRET = os.getenv("WOMPI_EVENTS_SECRET", "test_events_secret")
 WOMPI_INTEGRITY_SECRET = os.getenv("WOMPI_INTEGRITY_SECRET", "test_integrity_secret")
 
 PACKAGES = {
+    "MICRO_PACK_1": {
+        "name": "Paquete Micro / Ensayos Cortos (1 Crédito)",
+        "price_cop": 10000,
+        "amount_in_cents": 1000000,
+        "credits": 1,
+        "tier": "standard",
+        "description": "1 micro-ensayo, ficha de lectura o aporte al foro (1 a 5 págs)."
+    },
+    "BASIC_PACK_2": {
+        "name": "Plan Básico / Tarea Regular (2 Créditos)",
+        "price_cop": 20000,
+        "amount_in_cents": 2000000,
+        "credits": 2,
+        "tier": "standard",
+        "description": "Tarea regular de curso (psicología, educación, etc. de 13 a 30 págs) o corrección de hasta 50 págs."
+    },
     "STANDARD_PACK_5": {
-        "name": "Paquete Semestre Universitario (5 Créditos)",
+        "name": "Paquete Semestral Universitario (5 Créditos)",
         "price_cop": 50000,
         "amount_in_cents": 5000000,
         "credits": 5,
         "tier": "standard",
-        "description": "5 trabajos universitarios completos (UNAD/SENA) o 1 tesis de grado estándar."
+        "description": "2 a 3 tareas completas de 30 págs o corrección de tesis estándar."
     },
     "PREMIUM_PROJECT_PASS": {
-        "name": "Pase Macroproyecto de Grado / Tesis a la Medida",
-        "price_cop": 120000,
-        "amount_in_cents": 12000000,
-        "credits": 1,
+        "name": "Macro-Tesis de Posgrado / Proyecto Extenso (10 Créditos)",
+        "price_cop": 100000,
+        "amount_in_cents": 10000000,
+        "credits": 10,
         "tier": "premium_project",
-        "description": "1 Proyecto de investigación / Tesis completa estructurada desde cero según tu PDF de especificación."
+        "description": "Tesis de grado o posgrado > 140 págs con Reporte Integral de Auditoría en Excel."
     }
 }
 

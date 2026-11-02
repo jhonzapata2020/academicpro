@@ -339,7 +339,24 @@ function openRechargeModal() {
 function selectPlanQuote(credits, amount) {
   const display = document.getElementById("nequi-amount-display");
   if (display) display.textContent = "$" + Number(amount).toLocaleString("es-CO") + " COP";
-  selectedRechargePlan = credits === 10 ? "PREMIUM_PROJECT_PASS" : "STANDARD_PACK_5";
+  
+  if (credits === 10) {
+    selectedRechargePlan = "PREMIUM_PROJECT_PASS";
+  } else if (credits === 1) {
+    selectedRechargePlan = "MICRO_PACK_1";
+  } else if (credits === 2) {
+    selectedRechargePlan = "BASIC_PACK_2";
+  } else {
+    selectedRechargePlan = "STANDARD_PACK_5";
+  }
+
+  // Actualizar estado visual activo en las filas
+  document.querySelectorAll(".modal-plan-row").forEach(row => {
+    row.classList.remove("active");
+  });
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add("active");
+  }
 }
 
 function copyNequiNumber() {
@@ -689,3 +706,206 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
+
+/* =========================================================================
+   6. GESTIÓN DE AUTENTICACIÓN ANÓNIMA (ALIAS Y SESIÓN)
+   ========================================================================= */
+let currentAuthMode = "login"; // "login" o "register"
+
+function openAuthModal(mode = "login") {
+  const modal = document.getElementById("modal-auth");
+  if (modal) modal.style.display = "flex";
+  switchAuthMode(mode);
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById("modal-auth");
+  if (modal) modal.style.display = "none";
+}
+
+function switchAuthMode(mode) {
+  currentAuthMode = mode;
+  const tabLogin = document.getElementById("tab-btn-login");
+  const tabRegister = document.getElementById("tab-btn-register");
+  const fieldAlias = document.getElementById("field-auth-alias");
+  const fieldInst = document.getElementById("field-auth-inst");
+  const submitBtn = document.getElementById("auth-submit-btn");
+  const title = document.getElementById("auth-modal-title");
+
+  if (mode === "register") {
+    if (tabRegister) {
+      tabRegister.style.color = "#10B981";
+      tabRegister.style.borderBottomColor = "#10B981";
+    }
+    if (tabLogin) {
+      tabLogin.style.color = "#94A3B8";
+      tabLogin.style.borderBottomColor = "transparent";
+    }
+    if (fieldAlias) fieldAlias.style.display = "block";
+    if (fieldInst) fieldInst.style.display = "block";
+    if (submitBtn) submitBtn.textContent = "Crear Cuenta (+2 Créditos Gratis)";
+    if (title) title.textContent = "Registro Anónimo";
+  } else {
+    if (tabLogin) {
+      tabLogin.style.color = "#10B981";
+      tabLogin.style.borderBottomColor = "#10B981";
+    }
+    if (tabRegister) {
+      tabRegister.style.color = "#94A3B8";
+      tabRegister.style.borderBottomColor = "transparent";
+    }
+    if (fieldAlias) fieldAlias.style.display = "none";
+    if (fieldInst) fieldInst.style.display = "none";
+    if (submitBtn) submitBtn.textContent = "Entrar a AcademicPro";
+    if (title) title.textContent = "Acceso Estudiante";
+  }
+}
+
+function getDeviceFingerprint() {
+  let fp = localStorage.getItem("academicpro_device_id");
+  if (!fp) {
+    fp = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
+    localStorage.setItem("academicpro_device_id", fp);
+  }
+  return fp;
+}
+
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  const saved = localStorage.getItem("academicpro_user");
+  if (!saved) {
+    openAuthModal("login");
+    return;
+  }
+  const menu = document.getElementById("user-profile-menu");
+  if (menu) {
+    menu.style.display = (menu.style.display === "none" || !menu.style.display) ? "block" : "none";
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem("academicpro_user");
+  const menu = document.getElementById("user-profile-menu");
+  if (menu) menu.style.display = "none";
+
+  applyUserSession(null);
+  alert("Sesión cerrada correctamente.");
+}
+
+// Cerrar menú al hacer clic fuera
+window.addEventListener("click", (e) => {
+  const menu = document.getElementById("user-profile-menu");
+  const avatar = document.getElementById("btn-user-avatar");
+  if (menu && menu.style.display === "block" && !menu.contains(e.target) && (!avatar || !avatar.contains(e.target))) {
+    menu.style.display = "none";
+  }
+});
+
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById("auth-email-input").value.trim();
+  const password = document.getElementById("auth-pwd-input").value.trim();
+  const alias = document.getElementById("auth-alias-input")?.value?.trim() || "Estudiante";
+  const inst = document.getElementById("auth-inst-select")?.value || "UNAD";
+  const feedback = document.getElementById("auth-msg-feedback");
+
+  feedback.style.display = "block";
+  feedback.style.color = "#38BDF8";
+  feedback.textContent = "Verificando...";
+
+  try {
+    const endpoint = currentAuthMode === "register" ? "/api/auth/register" : "/api/auth/login";
+    const payload = currentAuthMode === "register" 
+      ? { email, password, username_alias: alias, institution: inst, device_fingerprint: getDeviceFingerprint() }
+      : { email, password };
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      feedback.style.color = "#EF4444";
+      feedback.textContent = data.detail || "Error en la autenticación.";
+      return;
+    }
+
+    // Guardar sesión en localStorage
+    const user = data.user;
+    localStorage.setItem("academicpro_user", JSON.stringify(user));
+
+    feedback.style.color = "#34D399";
+    feedback.textContent = data.user.message || "¡Bienvenido! Sesión iniciada con éxito.";
+
+    setTimeout(() => {
+      closeAuthModal();
+      applyUserSession(user);
+    }, 700);
+
+  } catch (err) {
+    feedback.style.color = "#EF4444";
+    feedback.textContent = "Error al conectar con el servidor.";
+  }
+}
+
+function applyUserSession(user) {
+  const btnLogin = document.getElementById("btn-navbar-login");
+  const btnUser = document.getElementById("btn-user-avatar");
+
+  if (user && user.email) {
+    // Modo autenticado: ocultar botón login y mostrar chip con usuario
+    if (btnLogin) btnLogin.style.display = "none";
+    if (btnUser) btnUser.style.display = "inline-flex";
+
+    const initials = user.username_alias ? user.username_alias.substring(0, 2).toUpperCase() : "ES";
+    const avatarEl = document.getElementById("user-avatar-initials");
+    if (avatarEl) avatarEl.textContent = initials;
+
+    const navAlias = document.getElementById("navbar-user-alias");
+    if (navAlias) navAlias.textContent = user.username_alias || "Estudiante";
+
+    userBalance = user.balance !== undefined ? user.balance : 0;
+    const countEl = document.getElementById("credit-count");
+    if (countEl) countEl.textContent = userBalance;
+
+    const dropAlias = document.getElementById("drop-user-alias");
+    const dropInst = document.getElementById("drop-user-inst");
+    const dropEmail = document.getElementById("drop-user-email");
+    const dropBalance = document.getElementById("drop-user-balance");
+
+    if (dropAlias) dropAlias.textContent = `👤 ${user.username_alias}`;
+    if (dropInst) dropInst.textContent = user.institution || "UNAD";
+    if (dropEmail) dropEmail.textContent = user.email;
+    if (dropBalance) dropBalance.textContent = `${userBalance} Créditos`;
+
+    if (btnUser) btnUser.title = `${user.username_alias} (${user.email}) - ${userBalance} Créditos`;
+  } else {
+    // Modo anónimo: mostrar botón login y ocultar chip de usuario
+    if (btnLogin) btnLogin.style.display = "inline-flex";
+    if (btnUser) btnUser.style.display = "none";
+
+    userBalance = 0;
+    const countEl = document.getElementById("credit-count");
+    if (countEl) countEl.textContent = "0";
+  }
+}
+
+function restoreUserSession() {
+  try {
+    const saved = localStorage.getItem("academicpro_user");
+    if (saved) {
+      const user = JSON.parse(saved);
+      applyUserSession(user);
+    } else {
+      applyUserSession(null);
+    }
+  } catch (e) {
+    applyUserSession(null);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  restoreUserSession();
+});

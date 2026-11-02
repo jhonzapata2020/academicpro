@@ -1,9 +1,9 @@
 -- =========================================================================
--- ACADEMICPRO AI - SUPABASE DATABASE SCHEMA (PRODUCTION-READY)
--- PostgreSQL + Row Level Security (RLS) + Wompi Payment Sync + Credit Counter
+-- 🎓 ACADEMICPRO AI - SUPABASE DATABASE SCHEMA (PRODUCTION-READY)
+-- PostgreSQL + Row Level Security (RLS) + Onboarding Testers + Auditoría
 -- =========================================================================
 
--- Habilitar extensión UUID si no está activa
+-- Habilitar extensión UUID
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. TABLA DE PERFILES DE USUARIOS (Sincronizada con auth.users de Supabase)
@@ -12,70 +12,92 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     email TEXT NOT NULL UNIQUE,
     full_name TEXT,
     institution TEXT DEFAULT 'UNAD',
+    phone TEXT,
+    is_tester BOOLEAN DEFAULT TRUE,                     -- Habilitado para testers iniciales (Uso Gratuito)
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. TABLA DE BILLETERA DE CRÉDITOS ACADÉMICOS MULTI-TIER
+-- 2. TABLA DE BILLETERA DE CRÉDITOS ACADÉMICOS
 CREATE TABLE IF NOT EXISTS public.user_credits (
     user_id UUID PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE,
-    balance INT NOT NULL DEFAULT 1,                     -- Créditos regulares (1 Gratis al registrarse)
-    premium_projects_balance INT NOT NULL DEFAULT 0,    -- Pases de Proyectos de Grado / Tesis desde Cero
-    total_earned INT NOT NULL DEFAULT 1,
+    balance INT NOT NULL DEFAULT 10,                    -- 10 créditos de cortesía para testers iniciales
+    premium_projects_balance INT NOT NULL DEFAULT 2,    -- 2 pases de proyectos de grado para pruebas
+    total_earned INT NOT NULL DEFAULT 10,
     total_spent INT NOT NULL DEFAULT 0,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 3. TABLA DE TRANSACCIONES Y PAGOS (WOMPI / NEQUI / PSE)
-CREATE TABLE IF NOT EXISTS public.transactions (
+-- 3. TABLA DE ARCHIVOS Y GUÍAS SUBIDAS POR EL ESTUDIANTE
+CREATE TABLE IF NOT EXISTS public.uploaded_files (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    reference TEXT NOT NULL UNIQUE, -- Código de referencia único enviado a Wompi
-    wompi_id TEXT UNIQUE,           -- ID oficial de la transacción en Wompi
-    tier_type TEXT NOT NULL DEFAULT 'STANDARD_PACK_5', -- STANDARD_PACK_5 ($50k) o PREMIUM_PROJECT_PASS ($120k)
-    amount_in_cents BIGINT NOT NULL, -- 5000000 ($50.000 COP) o 12000000 ($120.000 COP)
-    currency TEXT DEFAULT 'COP',
-    payment_method_type TEXT,       -- NEQUI, BANCOLOMBIA_COLLECT, PSE, CARD
-    status TEXT NOT NULL DEFAULT 'PENDING', -- PENDING, APPROVED, DECLINED, VOIDED
-    credits_granted INT NOT NULL DEFAULT 5, -- 5 créditos estándar o 1 pase de macroproyecto
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    filename TEXT NOT NULL,
+    file_type TEXT NOT NULL,                            -- 'guide_pdf', 'rubric_pdf', 'template_docx', 'template_xlsx'
+    file_size_bytes BIGINT DEFAULT 0,
+    storage_path TEXT NOT NULL,
+    extracted_text TEXT,
+    missing_fields JSONB DEFAULT '[]'::jsonb,           -- Preguntas o datos faltantes detectados por la IA
+    status TEXT DEFAULT 'ANALYZED',                     -- 'UPLOADED', 'ANALYZING', 'ANALYZED', 'REQUIRES_INFO'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 4. HISTORIAL DE TRABAJOS Y DOCUMENTOS PROCESADOS
+-- 4. HISTORIAL DE TRABAJOS GENERADOS Y AUDITADOS (WORD + EXCEL)
 CREATE TABLE IF NOT EXISTS public.document_tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    mode TEXT NOT NULL CHECK (mode IN ('generator', 'auditor')), -- Generador desde Guía o Auditor de Tesis
+    mode TEXT NOT NULL CHECK (mode IN ('generator', 'auditor', 'excel_filler')),
     title TEXT NOT NULL,
-    institution TEXT NOT NULL, -- UNAD, SENA, UNIVERSIDAD_GENERAL
+    institution TEXT NOT NULL DEFAULT 'UNAD',
     font_family TEXT DEFAULT 'Times New Roman',
-    include_toc BOOLEAN DEFAULT FALSE,
     output_docx_path TEXT,
-    output_excel_path TEXT,
+    output_excel_path TEXT,                             -- Reporte comparativo de auditoría o plantilla Excel llena
     pedagogical_summary TEXT,
-    status TEXT NOT NULL DEFAULT 'COMPLETED',
+    audit_score INT DEFAULT 100,                        -- Calificación de cumplimiento APA 7 (0 a 100%)
+    audit_findings JSONB DEFAULT '[]'::jsonb,           -- Lista de correcciones aplicadas automáticamente
+    bytes_generated BIGINT DEFAULT 0,                   -- Cantidad de bytes generados para control de métricas
+    pages_count INT DEFAULT 1,
+    status TEXT NOT NULL DEFAULT 'COMPLETED',           -- 'PENDING', 'PROCESSING', 'REQUIRES_INFO', 'COMPLETED', 'FAILED'
     credits_cost INT NOT NULL DEFAULT 1,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 5. TABLA DE TRANSACCIONES Y PAGOS (WOMPI / NEQUI)
+CREATE TABLE IF NOT EXISTS public.transactions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    reference TEXT NOT NULL UNIQUE,
+    wompi_id TEXT UNIQUE,
+    tier_type TEXT NOT NULL DEFAULT 'STANDARD_PACK_5',
+    amount_in_cents BIGINT NOT NULL,
+    currency TEXT DEFAULT 'COP',
+    payment_method_type TEXT,
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    credits_granted INT NOT NULL DEFAULT 5,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- =========================================================================
--- TRIGGER AUTOMÁTICO: ONBOARDING CON 1 CRÉDITO GRATIS
+-- TRIGGER AUTOMÁTICO: ONBOARDING CON ACCESO GRATIS PARA TESTERS
 -- =========================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Crear perfil público
-    INSERT INTO public.profiles (id, email, full_name)
+    INSERT INTO public.profiles (id, email, full_name, is_tester)
     VALUES (
         NEW.id,
         NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1))
-    );
+        COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
+        TRUE -- Marcado como tester para pruebas en tiempo real
+    )
+    ON CONFLICT (id) DO NOTHING;
 
-    -- Asignar automáticamente 1 crédito gratuito de prueba
-    INSERT INTO public.user_credits (user_id, balance, total_earned, total_spent)
-    VALUES (NEW.id, 1, 1, 0);
+    -- Asignar saldo inicial de pruebas (10 créditos estándar + 2 pases de proyectos)
+    INSERT INTO public.user_credits (user_id, balance, premium_projects_balance, total_earned, total_spent)
+    VALUES (NEW.id, 10, 2, 10, 0)
+    ON CONFLICT (user_id) DO NOTHING;
 
     RETURN NEW;
 END;
@@ -94,7 +116,20 @@ CREATE OR REPLACE FUNCTION public.deduct_credit(p_user_id UUID, p_cost INT DEFAU
 RETURNS BOOLEAN AS $$
 DECLARE
     current_bal INT;
+    is_user_tester BOOLEAN;
 BEGIN
+    -- Verificar si es tester gratuito
+    SELECT is_tester INTO is_user_tester FROM public.profiles WHERE id = p_user_id;
+    
+    IF is_user_tester IS TRUE THEN
+        -- A los testers no se les bloquea la app
+        UPDATE public.user_credits
+        SET total_spent = total_spent + p_cost,
+            updated_at = NOW()
+        WHERE user_id = p_user_id;
+        RETURN TRUE;
+    END IF;
+
     SELECT balance INTO current_bal FROM public.user_credits WHERE user_id = p_user_id FOR UPDATE;
 
     IF current_bal IS NULL OR current_bal < p_cost THEN
@@ -112,123 +147,29 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- =========================================================================
--- FUNCIÓN TRANSACCIONAL: ACREDITAR CRÉDITOS TRAS APROBACIÓN WOMPI (WEBHOOK)
--- =========================================================================
-CREATE OR REPLACE FUNCTION public.process_wompi_payment(
-    p_reference TEXT,
-    p_wompi_id TEXT,
-    p_status TEXT,
-    p_payment_type TEXT
-)
-RETURNS BOOLEAN AS $$
-DECLARE
-    v_user_id UUID;
-    v_credits INT;
-    v_curr_status TEXT;
-BEGIN
-    SELECT user_id, credits_granted, status 
-    INTO v_user_id, v_credits, v_curr_status
-    FROM public.transactions
-    WHERE reference = p_reference
-    FOR UPDATE;
-
-    IF NOT FOUND THEN
-        RETURN FALSE;
-    END IF;
-
-    -- Si ya fue aprobada previamente, evitar duplicidad
-    IF v_curr_status = 'APPROVED' THEN
-        RETURN TRUE;
-    END IF;
-
-    -- Actualizar estado de la transacción
-    UPDATE public.transactions
-    SET wompi_id = p_wompi_id,
-        status = p_status,
-        payment_method_type = p_payment_type,
-        updated_at = NOW()
-    WHERE reference = p_reference;
-
-    -- Si el pago fue aprobado, sumar los créditos
-    IF p_status = 'APPROVED' THEN
-        UPDATE public.user_credits
-        SET balance = balance + v_credits,
-            total_earned = total_earned + v_credits,
-            updated_at = NOW()
-        WHERE user_id = v_user_id;
-    END IF;
-
-    RETURN TRUE;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- =========================================================================
--- ROW LEVEL SECURITY (SEGURIDAD PARA EL FRONTEND)
+-- ROW LEVEL SECURITY (RLS) - SEGURIDAD DE DATOS
 -- =========================================================================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_credits ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.uploaded_files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.document_tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 
--- Políticas de acceso para el usuario autenticado
+-- Políticas de perfiles
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
+-- Políticas de créditos
 CREATE POLICY "Users can view own credits" ON public.user_credits FOR SELECT USING (auth.uid() = user_id);
 
+-- Políticas de archivos subidos
+CREATE POLICY "Users can view own uploaded files" ON public.uploaded_files FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own uploaded files" ON public.uploaded_files FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Políticas de tareas y documentos
+CREATE POLICY "Users can view own document tasks" ON public.document_tasks FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own document tasks" ON public.document_tasks FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Políticas de transacciones
 CREATE POLICY "Users can view own transactions" ON public.transactions FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert pending transactions" ON public.transactions FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view own document tasks" ON public.document_tasks FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can create document tasks" ON public.document_tasks FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- =========================================================================
--- 5. TABLAS ESPECÍFICAS PARA AUTOMATIZACIÓN DE INTEGROMAT (MAKE)
--- Sincronización directa con Webhooks, Nequi y WhatsApp Directo de Jhon
--- =========================================================================
-
--- Tabla de Usuarios consumida por Make
-CREATE TABLE IF NOT EXISTS public.usuarios (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nombre TEXT NOT NULL,
-    celular TEXT NOT NULL,
-    email TEXT UNIQUE,
-    creditos_disponibles INT DEFAULT 1,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Tabla de Trabajos Académicos
-CREATE TABLE IF NOT EXISTS public.trabajos_academicos (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    usuario_id UUID REFERENCES public.usuarios(id) ON DELETE CASCADE,
-    tipo_servicio TEXT NOT NULL CHECK (tipo_servicio IN ('creacion', 'correccion')),
-    nombre_archivo TEXT,
-    paginas_generadas INT NOT NULL DEFAULT 1,
-    instrucciones_tutor TEXT,
-    estado_pago TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado_pago IN ('pendiente', 'aprobado', 'rechazado')),
-    url_docx_protegido TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Tabla de Pagos Nequi y Verificación Semi-Asistida
-CREATE TABLE IF NOT EXISTS public.pagos_nequi (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    trabajo_id UUID REFERENCES public.trabajos_academicos(id) ON DELETE SET NULL,
-    monto INT NOT NULL,
-    rrn_aprobacion TEXT NOT NULL UNIQUE,
-    comprobante_url TEXT,
-    estado_verificacion TEXT NOT NULL DEFAULT 'PENDIENTE_REVISION' CHECK (estado_verificacion IN ('PENDIENTE_REVISION', 'APROBADO_AUTOMATICO', 'APROBADO_MANUAL', 'RECHAZADO')),
-    verificado_por TEXT DEFAULT 'Jhon Zapata (+57 320 710 5618)',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Habilitar RLS para tablas Make
-ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.trabajos_academicos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pagos_nequi ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Allow public insert to usuarios" ON public.usuarios FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow service role full access to usuarios" ON public.usuarios FOR ALL USING (true);
-CREATE POLICY "Allow service role full access to trabajos_academicos" ON public.trabajos_academicos FOR ALL USING (true);
-CREATE POLICY "Allow service role full access to pagos_nequi" ON public.pagos_nequi FOR ALL USING (true);
-

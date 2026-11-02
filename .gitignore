@@ -20,6 +20,10 @@ storage/outputs/*
 !storage/outputs/.gitkeep
 storage/vouchers/*
 !storage/vouchers/.gitkeep
+storage/sent_emails/*
+!storage/sent_emails/.gitkeep
+storage/vault_local_backup/*
+!storage/vault_local_backup/.gitkeep
 
 # IDEs and OS metadata
 .vscode/

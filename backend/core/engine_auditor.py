@@ -18,6 +18,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 def audit_and_correct_thesis(
     input_docx_path,
     feedback_file_path=None,
+    tutor_instructions=None,
     font_family="Times New Roman",
     font_size=12,
     line_spacing=1.5,

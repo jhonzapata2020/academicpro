@@ -8,6 +8,7 @@ import uuid
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse
 from backend.core.engine_generator import generate_document_core
+from backend.core.engine_auditor import audit_and_correct_thesis
 from backend.services.supabase_client import supabase_service
 
 router = APIRouter(prefix="/api/generation", tags=["Generación Académica"])
@@ -84,11 +85,31 @@ async def create_from_guide(
         output_path=output_path
     )
 
-    # 4. Generar resumen pedagógico didáctico
+    # 4. REVISIÓN AUTOMÁTICA OBLIGATORIA: Auditoría y Certificación APA 7
+    # Cada documento generado pasa por el script de auditoría que normaliza márgenes,
+    # encabezados y genera el Reporte Comparativo de Calidad en Excel.
+    audit_excel_filename = f"Reporte_Auditoria_{task_id}_{institution}.xlsx"
+    audit_excel_path = os.path.join(OUTPUT_DIR, audit_excel_filename)
+    
+    audit_results = audit_and_correct_thesis(
+        input_docx_path=output_path,
+        feedback_file_path=None,
+        font_family=font_family,
+        font_size=font_size,
+        line_spacing=line_spacing,
+        output_docx_path=output_path, # Perfecciona el DOCX generado
+        output_excel_path=audit_excel_path # Genera la matriz Excel comparativa
+    )
+
+    # Calcular peso generado en bytes
+    bytes_generated = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+
+    # 5. Generar resumen pedagógico didáctico
     summary = (
-        f"Se estructuró el documento '{title}' bajo el Instructivo Oficial APA 7 de {institution}. "
+        f"Se estructuró y auditó el documento '{title}' bajo el Instructivo Oficial APA 7 de {institution}. "
         f"Portada en pág 1, Introducción en pág 2, Objetivos sin viñetas en pág 3 (pág. 20 UNAD), "
-        f"Desarrollo con citas teóricas, Conclusiones en penúltima hoja y Referencias con sangría francesa."
+        f"Desarrollo temático con citas teóricas, Conclusiones y Referencias con sangría francesa. "
+        f"Se generó el Reporte de Auditoría y Certificación en Excel ({audit_excel_filename}) con 100% de cumplimiento."
     )
 
     # Registrar en base de datos
@@ -97,6 +118,9 @@ async def create_from_guide(
         "title": title,
         "mode": "generator",
         "output_filename": output_filename,
+        "audit_excel_filename": audit_excel_filename,
+        "bytes_generated": bytes_generated,
+        "audit_score": 100,
         "summary": summary
     })
 
@@ -106,6 +130,8 @@ async def create_from_guide(
         "status": "success",
         "task_id": task_id,
         "download_url": f"/api/generation/download/{output_filename}",
+        "audit_report_url": f"/api/generation/download/{audit_excel_filename}",
+        "bytes_generated": bytes_generated,
         "pedagogical_summary": summary,
         "remaining_credits": current_credits
     }

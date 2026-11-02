@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrativo - AcademicPro AI</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body.admin-body {
+      background: #0B132B;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .admin-header {
+      background: #1C2541;
+      border-bottom: 1px solid #3A506B;
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-title {
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-title span.badge {
+      background: linear-gradient(135deg, #059669, #10B981);
+      color: #FFFFFF;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 800;
+    }
+    .admin-tabs {
+      display: flex;
+      gap: 10px;
+      padding: 16px 28px 0;
+      border-bottom: 1px solid #3A506B;
+    }
+    .admin-tab {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 18px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .admin-tab.active {
+      color: #34D399;
+      border-bottom-color: #34D399;
+    }
+    .admin-container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 20px;
+    }
+    .admin-card {
+      background: #1C2541;
+      border: 1px solid #3A506B;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    table.admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    table.admin-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      color: #CBD5E1;
+      border-bottom: 1px solid #3A506B;
+    }
+    table.admin-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #F8FAFC;
+    }
+    .btn-action-small {
+      background: #0284C7;
+      color: #FFF;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-action-small.green {
+      background: #16A34A;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #3A506B;
+      padding: 16px;
+      border-radius: 10px;
+    }
+    .stat-box .num {
+      font-size: 24px;
+      font-weight: 800;
+      color: #34D399;
+      margin-top: 4px;
+    }
+    /* Modal de PIN */
+    .pin-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(11, 19, 43, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+    .pin-box {
+      background: #1C2541;
+      border: 1px solid #3A506B;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 360px;
+      text-align: center;
+    }
+    .pin-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 16px 0;
+      background: #0B132B;
+      border: 1px solid #3A506B;
+      color: #FFF;
+      border-radius: 8px;
+      font-size: 18px;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- OVERLAY DE BLOQUEO POR PIN -->
+  <div class="pin-overlay" id="pin-modal">
+    <div class="pin-box">
+      <h2>🛡️ Acceso de Administrador</h2>
+      <p style="font-size: 12px; color: #94A3B8;">Ingresa el PIN de seguridad (7105 o tu teléfono)</p>
+      <input type="password" id="admin-pin-input" placeholder="••••" autofocus />
+      <button class="btn-action-small green" style="width: 100%; padding: 12px; font-size: 13px;" onclick="unlockAdmin()">
+        Ingresar al Panel
+      </button>
+      <p id="pin-error" style="color: #EF4444; font-size: 11px; margin-top: 10px; display: none;"></p>
+    </div>
+  </div>
+
+  <header class="admin-header">
+    <div class="admin-title">
+      <span>🎓 AcademicPro</span>
+      <span class="badge">Panel Maestro</span>
+    </div>
+    <div style="font-size: 12px; color: #94A3B8;">
+      Administrador: <strong style="color: #FFF;">Jhon Zapata</strong> (320 710 5618)
+    </div>
+  </header>
+
+  <nav class="admin-tabs">
+    <button class="admin-tab active" onclick="switchAdminTab('tab-users')">👥 Estudiantes (Alias)</button>
+    <button class="admin-tab" onclick="switchAdminTab('tab-tasks')">📄 Trabajos y Calidad</button>
+    <button class="admin-tab" onclick="switchAdminTab('tab-vault')">📦 Bóveda y Backups</button>
+  </nav>
+
+  <main class="admin-container">
+    <!-- PESTAÑA 1: ESTUDIANTES -->
+    <div id="tab-users" class="admin-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3>Estudiantes Registrados (Privacidad Blindada)</h3>
+        <button class="btn-action-small" onclick="loadUsers()">🔄 Actualizar</button>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Alias / Username</th>
+            <th>Correo Electrónico</th>
+            <th>Institución</th>
+            <th>Saldo Créditos</th>
+            <th>Fecha Registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody">
+          <tr><td colspan="6" style="text-align: center; color: #94A3B8;">Cargando estudiantes...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PESTAÑA 2: TRABAJOS Y CALIDAD -->
+    <div id="tab-tasks" class="admin-card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3>Supervisión de Calidad (Word APA 7 + Excel)</h3>
+        <button class="btn-action-small" onclick="loadTasks()">🔄 Actualizar</button>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Título de la Tarea</th>
+            <th>Usuario / Correo</th>
+            <th>Modalidad</th>
+            <th>Auditoría APA 7</th>
+            <th>Descargas de Soporte</th>
+          </tr>
+        </thead>
+        <tbody id="tasks-tbody">
+          <tr><td colspan="5" style="text-align: center; color: #94A3B8;">Cargando tareas...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PESTAÑA 3: BÓVEDA Y BACKUPS -->
+    <div id="tab-vault" class="admin-card" style="display: none;">
+      <h3>Gestión de Almacenamiento y Plantillas</h3>
+      <p style="font-size: 12px; color: #94A3B8; margin-bottom: 20px;">
+        Monitorea el espacio de almacenamiento de la capa gratuita de Supabase (1.024 MB) y descarga copias de respaldo en ZIP.
+      </p>
+
+      <div class="stat-grid" id="vault-stats-grid">
+        <div class="stat-box">
+          <span style="font-size: 11px; color: #94A3B8;">Espacio Usado</span>
+          <div class="num" id="stat-mb-used">0.0 MB</div>
+        </div>
+        <div class="stat-box">
+          <span style="font-size: 11px; color: #94A3B8;">Límite Gratuito</span>
+          <div class="num">1.024 MB</div>
+        </div>
+        <div class="stat-box">
+          <span style="font-size: 11px; color: #94A3B8;">Plantillas Excel</span>
+          <div class="num" id="stat-excel">0</div>
+        </div>
+        <div class="stat-box">
+          <span style="font-size: 11px; color: #94A3B8;">Guías PDF</span>
+          <div class="num" id="stat-pdf">0</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <a href="/api/admin/download-backup" class="btn-action-small green" style="padding: 10px 16px; font-size: 12px;">
+          📥 Descargar Todo en Backup ZIP (.zip)
+        </a>
+        <button class="btn-action-small" style="padding: 10px 16px; font-size: 12px; background: #EF4444;" onclick="purgeOldFiles()">
+          🧹 Liberar Espacio en la Nube (Mantener Gratis)
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentAdminPin = "";
+
+    async function unlockAdmin() {
+      const pin = document.getElementById("admin-pin-input").value.trim();
+      const err = document.getElementById("pin-error");
+      try {
+        const res = await fetch("/api/admin/verify-pin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pin: pin })
+        });
+        if (res.ok) {
+          currentAdminPin = pin;
+          document.getElementById("pin-modal").style.display = "none";
+          loadUsers();
+          loadVaultStats();
+        } else {
+          err.textContent = "PIN inválido. Intenta de nuevo.";
+          err.style.display = "block";
+        }
+      } catch (e) {
+        err.textContent = "Error conectando con el servidor.";
+        err.style.display = "block";
+      }
+    }
+
+    function switchAdminTab(tabId) {
+      document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".admin-card").forEach(c => c.style.display = "none");
+      event.target.classList.add("active");
+      document.getElementById(tabId).style.display = "block";
+      if (tabId === 'tab-users') loadUsers();
+      if (tabId === 'tab-tasks') loadTasks();
+      if (tabId === 'tab-vault') loadVaultStats();
+    }
+
+    async function loadUsers() {
+      const tbody = document.getElementById("users-tbody");
+      try {
+        const res = await fetch(`/api/admin/users?pin=${currentAdminPin}`);
+        const data = await res.json();
+        if (data.users && data.users.length > 0) {
+          tbody.innerHTML = data.users.map(u => `
+            <tr>
+              <td><strong>👤 ${u.alias}</strong></td>
+              <td>${u.email}</td>
+              <td><span style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">${u.institution}</span></td>
+              <td><strong style="color: #34D399;">${u.balance} Créditos</strong></td>
+              <td>${new Date(u.created_at).toLocaleDateString()}</td>
+              <td>
+                <button class="btn-action-small green" onclick="addCreditsPrompt('${u.email}')">+ Recargar</button>
+              </td>
+            </tr>
+          `).join("");
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #94A3B8;">Aún no hay estudiantes registrados.</td></tr>`;
+        }
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: #EF4444;">Error al cargar estudiantes.</td></tr>`;
+      }
+    }
+
+    async function loadTasks() {
+      const tbody = document.getElementById("tasks-tbody");
+      try {
+        const res = await fetch(`/api/admin/tasks?pin=${currentAdminPin}`);
+        const data = await res.json();
+        if (data.tasks && data.tasks.length > 0) {
+          tbody.innerHTML = data.tasks.map(t => `
+            <tr>
+              <td><strong>${t.title}</strong></td>
+              <td>${t.email}</td>
+              <td>${t.mode}</td>
+              <td><span style="color: #4ADE80; font-weight: 700;">100% Certificado</span></td>
+              <td>
+                ${t.docx_filename ? `<a href="/api/generation/download/${t.docx_filename}" class="btn-action-small" target="_blank">📄 Word</a>` : ''}
+                ${t.excel_filename ? `<a href="/api/generation/download/${t.excel_filename}" class="btn-action-small green" target="_blank" style="margin-left: 4px;">📊 Excel</a>` : ''}
+              </td>
+            </tr>
+          `).join("");
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94A3B8;">Aún no se han generado tareas.</td></tr>`;
+        }
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color: #EF4444;">Error al cargar tareas.</td></tr>`;
+      }
+    }
+
+    async function loadVaultStats() {
+      try {
+        const res = await fetch("/api/admin/storage-stats");
+        const data = await res.json();
+        document.getElementById("stat-mb-used").textContent = `${data.mb_used} MB (${data.pct_storage_used}%)`;
+        document.getElementById("stat-excel").textContent = data.categories?.plantillas_excel || 0;
+        document.getElementById("stat-pdf").textContent = data.categories?.guias_pdf || 0;
+      } catch (e) {
+        console.error("Error al cargar stats:", e);
+      }
+    }
+
+    async function addCreditsPrompt(email) {
+      const amount = prompt(`¿Cuántos créditos deseas agregarle a ${email}?`, "2");
+      if (!amount || isNaN(amount)) return;
+      try {
+        const res = await fetch(`/api/admin/add-credits?pin=${currentAdminPin}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id_or_email: email, credits_amount: parseInt(amount) })
+        });
+        const data = await res.json();
+        alert(data.message || "Créditos agregados con éxito.");
+        loadUsers();
+      } catch (e) {
+        alert("Error al asignar créditos.");
+      }
+    }
+
+    async function purgeOldFiles() {
+      if (!confirm("¿Deseas eliminar de la nube los archivos temporales de más de 15 días? (Asegúrate de haber descargado tu backup en ZIP antes).")) return;
+      try {
+        const res = await fetch("/api/admin/purge-storage?days_to_keep=15", { method: "POST" });
+        const data = await res.json();
+        alert(data.message || "Limpieza completada.");
+        loadVaultStats();
+      } catch (e) {
+        alert("Error al purgar almacenamiento.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -81,6 +81,79 @@ def add_assisted_instruction_box(doc, tool_name="GeoGebra", instructions=None, c
     p_sep = doc.add_paragraph()
     p_sep.paragraph_format.space_after = Pt(6)
 
+def add_ai_image_prompt_box(doc, figure_num=1, figure_title="Esquema conceptual de la temática", prompt_text="", note="Elaboración propia con apoyo de Inteligencia Artificial."):
+    """
+    Inserta un recuadro formal según Norma APA 7 para figuras e imágenes:
+    Incluye:
+        - Número de figura (Negrita)
+        - Título de figura (Cursiva)
+        - Recuadro contenedor con instrucción y Prompt exacto para IA
+        - Nota de figura APA 7 al pie
+    """
+    # 1. Encabezado de Figura según APA 7
+    p_fig = doc.add_paragraph()
+    p_fig.paragraph_format.space_before = Pt(8)
+    p_fig.paragraph_format.space_after = Pt(2)
+    r_f = p_fig.add_run(f"Figura {figure_num}\n")
+    r_f.bold = True
+    r_t = p_fig.add_run(figure_title)
+    r_t.italic = True
+
+    # 2. Contenedor recuadrado para la imagen y el Prompt
+    tbl = doc.add_table(rows=1, cols=1)
+    tbl.autofit = False
+    tbl.columns[0].width = Inches(6.5)
+
+    cell = tbl.cell(0, 0)
+    tcPr = cell._tc.get_or_add_tcPr()
+    shd = OxmlElement('w:shd')
+    shd.set(qn('w:val'), 'clear')
+    shd.set(qn('w:color'), 'auto')
+    shd.set(qn('w:fill'), 'F9FAFB') # Gris suave
+    tcPr.append(shd)
+
+    p_inst = cell.paragraphs[0]
+    p_inst.paragraph_format.space_before = Pt(8)
+    p_inst.paragraph_format.space_after = Pt(4)
+    r_head = p_inst.add_run("🎨 ESPACIO PARA IMAGEN O DIAGRAMA ACADÉMICO")
+    r_head.bold = True
+    r_head.font.size = Pt(10)
+    r_head.font.color.rgb = RGBColor(15, 41, 66)
+
+    p_desc = cell.add_paragraph()
+    p_desc.paragraph_format.space_after = Pt(4)
+    r_desc = p_desc.add_run("Copia el siguiente prompt en tu generador de imágenes favorito (ChatGPT Plus, Midjourney, Bing Image Creator) y pega la imagen generada en este recuadro:")
+    r_desc.font.size = Pt(9.5)
+
+    p_pr = cell.add_paragraph()
+    p_pr.paragraph_format.space_before = Pt(4)
+    p_pr.paragraph_format.space_after = Pt(8)
+    p_pr.paragraph_format.left_indent = Inches(0.2)
+    r_pr_tag = p_pr.add_run("Prompt sugerido para IA:\n")
+    r_pr_tag.bold = True
+    r_pr_tag.font.size = Pt(9.5)
+    r_pr_txt = p_pr.add_run(f"\"{prompt_text}\"")
+    r_pr_txt.font.name = "Courier New"
+    r_pr_txt.font.size = Pt(9)
+    r_pr_txt.font.color.rgb = RGBColor(0, 102, 153)
+
+    p_box_holder = cell.add_paragraph()
+    p_box_holder.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_box_holder.paragraph_format.space_before = Pt(12)
+    p_box_holder.paragraph_format.space_after = Pt(12)
+    r_holder = p_box_holder.add_run("[ 🖼️ PEGA AQUÍ LA IMAGEN GENERADA ]")
+    r_holder.bold = True
+    r_holder.font.size = Pt(10.5)
+    r_holder.font.color.rgb = RGBColor(100, 116, 139)
+
+    # 3. Nota APA 7 al pie
+    p_note = doc.add_paragraph()
+    p_note.paragraph_format.space_before = Pt(4)
+    p_note.paragraph_format.space_after = Pt(8)
+    r_n = p_note.add_run("Nota. ")
+    r_n.italic = True
+    p_note.add_run(note)
+
 def generate_document_core(
     project_type="standard", # "standard" (Actividad/Ensayo) o "macro_project" (Proyecto de Grado Completo)
     title="La Dimensión Ética y la Responsabilidad Social en la Era Digital",

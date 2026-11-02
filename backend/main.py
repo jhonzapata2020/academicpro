@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 
-from backend.routers import generation, auditing, credits, quote, webhook_integromat
+from backend.routers import generation, auditing, credits, quote, webhook_integromat, admin, auth
 
 app = FastAPI(
     title="AcademicPro AI API",
@@ -32,6 +32,8 @@ app.include_router(auditing.router)
 app.include_router(credits.router)
 app.include_router(quote.router)
 app.include_router(webhook_integromat.router)
+app.include_router(admin.router)
+app.include_router(auth.router)
 
 # Rutas estáticas del frontend
 def _find_frontend_dir() -> str:
@@ -65,6 +67,17 @@ async def serve_favicon():
         return FileResponse(fav_static)
     from fastapi import Response
     return Response(status_code=204)
+
+@app.get("/admin", response_class=HTMLResponse)
+async def serve_admin():
+    admin_file = os.path.join(FRONTEND_DIR, "admin.html")
+    if os.path.exists(admin_file):
+        try:
+            with open(admin_file, "r", encoding="utf-8") as f:
+                return HTMLResponse(content=f.read())
+        except Exception:
+            return FileResponse(admin_file)
+    return HTMLResponse(content="<h1>Panel Administrativo no encontrado</h1>")
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
