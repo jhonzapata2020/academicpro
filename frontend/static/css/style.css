@@ -1880,9 +1880,406 @@ body.wompi-theme {
 }
 
 /* =========================================================================
+   BOTONES INSTITUCIONALES DEL NAVBAR (LOGIN Y CREAR CUENTA)
+   ========================================================================= */
+.wompi-btn-register-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #014165;
+  color: #FFFFFF;
+  border: 1px solid #002D47;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.wompi-btn-register-nav:hover {
+  background: #002D47;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(1, 65, 101, 0.25);
+}
+
+.nav-free-badge {
+  background: #10B981;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.2px;
+}
+
+/* =========================================================================
    MODAL DE ACCESO ESTILO INSTITUCIONAL LIMPIO (INSPIRADO EN LA REFERENCIA)
    ========================================================================= */
 .institutional-login-card {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-radius: 28px !important;
+  max-width: 420px !important;
+  width: 90% !important;
+  padding: 32px 30px 24px !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 1px 1px rgba(0, 0, 0, 0.05) !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  max-height: 92vh !important;
+  overflow: hidden !important; /* Cero scrollbar en pantalla */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.institutional-login-card.institutional-register-card {
+  max-width: 440px !important;
+}
+
+/* Ocultar scrollbars por completo */
+.institutional-login-card::-webkit-scrollbar,
+.institutional-recharge-card::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* =========================================================================
+   MODAL DE RECARGA DE CRÉDITOS ACADÉMICOS (DISEÑO INSTITUCIONAL 2 COLUMNAS)
+   ========================================================================= */
+.institutional-recharge-card {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-radius: 26px !important;
+  max-width: 820px !important;
+  width: 95% !important;
+  padding: 24px 28px !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 1px 1px rgba(0, 0, 0, 0.05) !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  max-height: 90vh !important;
+  overflow: hidden !important; /* Cero barra de scroll */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.recharge-modal-header {
+  margin-bottom: 14px;
+  padding-right: 36px;
+}
+
+.recharge-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 3px;
+}
+
+.recharge-pill-badge {
+  background: #014165;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.recharge-modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0;
+  letter-spacing: -0.4px;
+}
+
+.recharge-modal-sub {
+  font-size: 12px;
+  color: #64748B;
+  margin: 0;
+}
+
+.recharge-modal-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.95fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.recharge-col-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+/* Lista de planes compacta en columna izquierda */
+.modal-plans-list-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-plan-card {
+  border: 1.5px solid #E2E8F0;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-plan-card:hover {
+  border-color: #94A3B8;
+  background: #F8FAFC;
+}
+
+.modal-plan-card.active {
+  border-color: #014165;
+  background: #F0F9FF;
+  box-shadow: 0 0 0 1px #014165;
+}
+
+.plan-card-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.modal-plan-card.active .plan-card-radio {
+  border-color: #014165;
+  background: #014165;
+}
+
+.modal-plan-card.active .plan-card-radio::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+
+.plan-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-card-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.plan-card-body h4 {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plan-card-body p {
+  font-size: 10.5px;
+  color: #64748B;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.plan-card-price {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0F172A;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.plan-card-price small {
+  font-size: 9.5px;
+  color: #64748B;
+  display: block;
+}
+
+.modal-plan-card.active .plan-card-price {
+  color: #014165;
+}
+
+/* Columna derecha: Checkout y Nequi */
+.recharge-summary-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-price-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #E2E8F0;
+  padding-bottom: 8px;
+}
+
+.summary-plan-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #014165;
+  background: #E0F2FE;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.summary-total-val {
+  font-size: 19px;
+  font-weight: 800;
+  color: #014165;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.nequi-transfer-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nequi-transfer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.nequi-copy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.nequi-num-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.copy-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-field strong {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.btn-copy-chip {
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #014165;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-chip:hover {
+  background: #014165;
+  color: #FFFFFF;
+  border-color: #014165;
+}
+
+.nequi-upload-box-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.upload-label-compact {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.receipt-dropzone-compact {
+  border: 1.5px dashed #CBD5E1;
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.receipt-dropzone-compact:hover {
+  border-color: #014165;
+  background: #F0F9FF;
+}
+
+.receipt-dropzone-compact .drop-icon {
+  font-size: 15px;
+}
+
+.receipt-dropzone-compact .drop-text {
+  font-size: 11px;
+  color: #64748B;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.recharge-support-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: #64748B;
+  padding-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .institutional-recharge-card {
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    padding: 18px 14px !important;
+  }
+  .recharge-modal-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
   background: #FFFFFF !important;
   color: #0F172A !important;
   border-radius: 28px !important;

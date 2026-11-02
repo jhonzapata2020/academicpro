@@ -325,9 +325,13 @@ function initModals() {
   const btnClose = document.getElementById("btn-close-modal");
 
   if (btnOpen) btnOpen.addEventListener("click", openRechargeModal);
-  if (btnClose && modal) btnClose.addEventListener("click", () => modal.style.display = "none");
+  if (btnClose && modal) btnClose.addEventListener("click", closeRechargeModal);
   window.addEventListener("click", (e) => {
-    if (e.target === modal) modal.style.display = "none";
+    if (e.target === modal) closeRechargeModal();
+    const modalAuth = document.getElementById("modal-auth");
+    if (e.target === modalAuth) closeLoginModal();
+    const modalReg = document.getElementById("modal-register");
+    if (e.target === modalReg) closeRegisterModal();
   });
 }
 
@@ -336,10 +340,27 @@ function openRechargeModal() {
   if (modal) modal.style.display = "flex";
 }
 
-function selectPlanQuote(credits, amount) {
+function closeRechargeModal() {
+  const modal = document.getElementById("modal-recharge");
+  if (modal) modal.style.display = "none";
+}
+
+function handleReceiptFileChange(input) {
+  const label = document.getElementById("receipt-file-label");
+  if (input && input.files && input.files.length > 0) {
+    if (label) label.textContent = input.files[0].name;
+  } else {
+    if (label) label.textContent = "Seleccionar comprobante (PDF o Foto)";
+  }
+}
+
+function selectPlanQuote(credits, amount, el) {
   const display = document.getElementById("nequi-amount-display");
   if (display) display.textContent = "$" + Number(amount).toLocaleString("es-CO") + " COP";
   
+  const planLabel = document.getElementById("recharge-plan-label");
+  if (planLabel) planLabel.textContent = `Paquete ${credits} Crédito${credits > 1 ? 's' : ''}`;
+
   if (credits === 10) {
     selectedRechargePlan = "PREMIUM_PROJECT_PASS";
   } else if (credits === 1) {
@@ -350,12 +371,14 @@ function selectPlanQuote(credits, amount) {
     selectedRechargePlan = "STANDARD_PACK_5";
   }
 
-  // Actualizar estado visual activo en las filas
-  document.querySelectorAll(".modal-plan-row").forEach(row => {
+  // Actualizar estado visual activo en las tarjetas
+  document.querySelectorAll(".modal-plan-card, .modal-plan-row").forEach(row => {
     row.classList.remove("active");
   });
-  if (event && event.currentTarget) {
-    event.currentTarget.classList.add("active");
+  if (el) {
+    el.classList.add("active");
+  } else if (window.event && window.event.currentTarget) {
+    window.event.currentTarget.classList.add("active");
   }
 }
 
@@ -716,45 +739,56 @@ function escapeHtml(str) {
 /* =========================================================================
    6. GESTIÓN DE AUTENTICACIÓN ANÓNIMA (ALIAS Y SESIÓN)
    ========================================================================= */
-let currentAuthMode = "login"; // "login" o "register"
+function openLoginModal() {
+  const modalReg = document.getElementById("modal-register");
+  if (modalReg) modalReg.style.display = "none";
+  const modalLogin = document.getElementById("modal-auth");
+  if (modalLogin) {
+    modalLogin.style.display = "flex";
+    const email = document.getElementById("auth-email-input");
+    if (email) setTimeout(() => email.focus(), 50);
+  }
+}
+
+function closeLoginModal() {
+  const modalLogin = document.getElementById("modal-auth");
+  if (modalLogin) modalLogin.style.display = "none";
+}
+
+function openRegisterModal() {
+  const modalLogin = document.getElementById("modal-auth");
+  if (modalLogin) modalLogin.style.display = "none";
+  const modalReg = document.getElementById("modal-register");
+  if (modalReg) {
+    modalReg.style.display = "flex";
+    const email = document.getElementById("reg-email-input");
+    if (email) setTimeout(() => email.focus(), 50);
+  }
+}
+
+function closeRegisterModal() {
+  const modalReg = document.getElementById("modal-register");
+  if (modalReg) modalReg.style.display = "none";
+}
 
 function openAuthModal(mode = "login") {
-  const modal = document.getElementById("modal-auth");
-  if (modal) modal.style.display = "flex";
-  switchAuthMode(mode);
+  if (mode === "register") {
+    openRegisterModal();
+  } else {
+    openLoginModal();
+  }
 }
 
 function closeAuthModal() {
-  const modal = document.getElementById("modal-auth");
-  if (modal) modal.style.display = "none";
+  closeLoginModal();
+  closeRegisterModal();
 }
 
 function switchAuthMode(mode) {
-  currentAuthMode = mode;
-  const tabLogin = document.getElementById("tab-btn-login");
-  const tabRegister = document.getElementById("tab-btn-register");
-  const panelLogin = document.getElementById("panel-login");
-  const panelRegister = document.getElementById("panel-register");
-
-  const loginFeedback = document.getElementById("auth-msg-feedback");
-  const regFeedback = document.getElementById("auth-reg-feedback");
-  if (loginFeedback) loginFeedback.style.display = "none";
-  if (regFeedback) regFeedback.style.display = "none";
-
   if (mode === "register") {
-    if (tabRegister) tabRegister.classList.add("active");
-    if (tabLogin) tabLogin.classList.remove("active");
-    if (panelLogin) panelLogin.style.display = "none";
-    if (panelRegister) panelRegister.style.display = "block";
-    const regEmail = document.getElementById("reg-email-input");
-    if (regEmail) regEmail.focus();
+    openRegisterModal();
   } else {
-    if (tabLogin) tabLogin.classList.add("active");
-    if (tabRegister) tabRegister.classList.remove("active");
-    if (panelLogin) panelLogin.style.display = "block";
-    if (panelRegister) panelRegister.style.display = "none";
-    const loginEmail = document.getElementById("auth-email-input");
-    if (loginEmail) loginEmail.focus();
+    openLoginModal();
   }
 }
 
@@ -771,7 +805,7 @@ function toggleUserDropdown(e) {
   e.stopPropagation();
   const saved = localStorage.getItem("academicpro_user");
   if (!saved) {
-    openAuthModal("login");
+    openLoginModal();
     return;
   }
   const menu = document.getElementById("user-profile-menu");
@@ -784,6 +818,13 @@ function handleLogout() {
   localStorage.removeItem("academicpro_user");
   const menu = document.getElementById("user-profile-menu");
   if (menu) menu.style.display = "none";
+
+  const btnLogin = document.getElementById("btn-navbar-login");
+  const btnRegister = document.getElementById("btn-navbar-register");
+  const btnUser = document.getElementById("btn-user-avatar");
+  if (btnLogin) btnLogin.style.display = "inline-flex";
+  if (btnRegister) btnRegister.style.display = "inline-flex";
+  if (btnUser) btnUser.style.display = "none";
 
   applyUserSession(null);
   alert("Sesión cerrada correctamente.");
@@ -924,7 +965,7 @@ async function handleRegisterSubmit(e) {
     }
 
     setTimeout(() => {
-      closeAuthModal();
+      closeRegisterModal();
       applyUserSession(user);
     }, 700);
 
@@ -948,11 +989,13 @@ async function handleAuthSubmit(e) {
 
 function applyUserSession(user) {
   const btnLogin = document.getElementById("btn-navbar-login");
+  const btnRegister = document.getElementById("btn-navbar-register");
   const btnUser = document.getElementById("btn-user-avatar");
 
   if (user && user.email) {
-    // Modo autenticado: ocultar botón login y mostrar chip con usuario
+    // Modo autenticado: ocultar botones de login y registro, mostrar chip de usuario
     if (btnLogin) btnLogin.style.display = "none";
+    if (btnRegister) btnRegister.style.display = "none";
     if (btnUser) btnUser.style.display = "inline-flex";
 
     const initials = user.username_alias ? user.username_alias.substring(0, 2).toUpperCase() : "ES";
@@ -978,8 +1021,9 @@ function applyUserSession(user) {
 
     if (btnUser) btnUser.title = `${user.username_alias} (${user.email}) - ${userBalance} Créditos`;
   } else {
-    // Modo anónimo: mostrar botón login y ocultar chip de usuario
+    // Modo anónimo: mostrar botones de login y registro, ocultar chip de usuario
     if (btnLogin) btnLogin.style.display = "inline-flex";
+    if (btnRegister) btnRegister.style.display = "inline-flex";
     if (btnUser) btnUser.style.display = "none";
 
     userBalance = 0;

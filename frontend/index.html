@@ -67,8 +67,14 @@
         <span class="btn-recharge-mobile">+ Recargar</span>
       </button>
 
+      <!-- BOTÓN REGISTRARSE (CUANDO NO ESTÁ AUTENTICADO) -->
+      <button class="wompi-btn-register-nav" id="btn-navbar-register" onclick="openRegisterModal()" title="Crea tu cuenta institucional y recibe 2 créditos gratis">
+        <span>Crea tu cuenta</span>
+        <span class="nav-free-badge">+2 Gratis</span>
+      </button>
+
       <!-- BOTÓN INICIAR SESIÓN (CUANDO NO ESTÁ AUTENTICADO) -->
-      <button class="wompi-btn-login" id="btn-navbar-login" onclick="openAuthModal('login')" title="Accede a tu cuenta o regístrate">
+      <button class="wompi-btn-login" id="btn-navbar-login" onclick="openLoginModal()" title="Accede con tus credenciales">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
@@ -419,101 +425,138 @@
 
   </main>
 
-  <!-- MODAL DUAL DE PAGOS (WOMPI + OCR NEQUI) -->
+  <!-- MODAL DE RECARGA DE CRÉDITOS ACADÉMICOS (DISEÑO INSTITUCIONAL 2 COLUMNAS SIN SCROLL) -->
   <div class="wompi-modal-overlay" id="modal-recharge" style="display: none;">
-    <div class="wompi-modal-card">
-      <div class="modal-card-header">
-        <div class="modal-header-brand">
-          <span class="wompi-modal-pill">Billetera de Créditos</span>
-          <h3>Recargar Créditos Académicos</h3>
+    <div class="institutional-recharge-card" id="recharge-modal-card">
+      
+      <!-- BOTÓN CERRAR SUPERIOR DERECHO -->
+      <button class="btn-modal-close-round" onclick="closeRechargeModal()" title="Cerrar modal">&times;</button>
+
+      <!-- ENCABEZADO INSTITUCIONAL -->
+      <div class="recharge-modal-header">
+        <div class="recharge-title-wrap">
+          <span class="recharge-pill-badge">Billetera de Créditos</span>
+          <h2 class="recharge-modal-title">Recargar Créditos Académicos</h2>
         </div>
-        <button class="btn-close-modal" id="btn-close-modal">&times;</button>
+        <p class="recharge-modal-sub">
+          Tarifa fija institucional: <b>1 Crédito = $10.000 COP</b> · Sin suscripciones recurrentes ni costos ocultos.
+        </p>
       </div>
 
-      <p class="modal-intro-text">
-        Tarifa fija institucional: <b>1 Crédito = $10.000 COP</b>. Recarga con tu cuenta de <b>Nequi, Bancolombia o PSE</b>:
-      </p>
+      <!-- CUERPO DE 2 COLUMNAS (GRID) -->
+      <div class="recharge-modal-grid">
+        
+        <!-- COLUMNA IZQUIERDA: SELECCIÓN DE PAQUETE -->
+        <div class="recharge-plans-col">
+          <span class="recharge-col-label">1. Selecciona tu Paquete</span>
 
-      <div class="modal-plans-list">
-        <div class="modal-plan-row" onclick="selectPlanQuote(1, 10000)">
-          <div class="plan-info">
-            <span class="plan-mini-tag">MICRO</span>
-            <h4>Paquete 1 Crédito (Tareas Cortas y Foros)</h4>
-            <p>Para micro-ensayos, fichas de lectura o aportes al foro (1 a 5 págs).</p>
-          </div>
-          <span class="plan-price-num">$10.000 <small>COP</small></span>
-        </div>
-
-        <div class="modal-plan-row" onclick="selectPlanQuote(2, 20000)">
-          <div class="plan-info">
-            <span class="plan-mini-tag">PLAN BÁSICO</span>
-            <h4>Paquete 2 Créditos (Tarea Regular de Curso o Corrección hasta 50 págs)</h4>
-            <p>Para materias regulares (psicología, investigación, epistemología) o corregir hasta 50 págs.</p>
-          </div>
-          <span class="plan-price-num">$20.000 <small>COP</small></span>
-        </div>
-
-        <div class="modal-plan-row active" onclick="selectPlanQuote(5, 50000)">
-          <div class="plan-info">
-            <span class="plan-mini-tag lime">MÁS POPULAR</span>
-            <h4>Paquete 5 Créditos (Paquete Semestral)</h4>
-            <p>Rinde para 2 a 3 tareas completas de 30 págs o corrección de tesis estándar.</p>
-          </div>
-          <span class="plan-price-num">$50.000 <small>COP</small></span>
-        </div>
-
-        <div class="modal-plan-row" onclick="selectPlanQuote(10, 100000)">
-          <div class="plan-info">
-            <span class="plan-mini-tag">MACRO-TESIS</span>
-            <h4>Paquete 10 Créditos (Tesis de Grado o Posgrado > 140 págs)</h4>
-            <p>Para investigaciones extensas con reporte integral de auditoría en Excel.</p>
-          </div>
-          <span class="plan-price-num">$100.000 <small>COP</small></span>
-        </div>
-      </div>
-
-      <!-- SECCIÓN DIRECTA NEQUI -->
-      <div class="nequi-direct-card">
-        <div class="nequi-direct-header">
-          <span>📱 Transferencia Directa Nequi</span>
-          <span class="verified-tag">✔ Cuenta Oficial: 320 710 5618</span>
-        </div>
-
-        <div class="nequi-nums-row">
-          <div class="nequi-num-col">
-            <label>NÚMERO NEQUI:</label>
-            <div class="copy-field">
-              <strong id="nequi-number-text">320 710 5618</strong>
-              <button class="btn-copy-chip" onclick="copyNequiNumber()">Copiar</button>
+          <div class="modal-plans-list-compact">
+            
+            <div class="modal-plan-card" onclick="selectPlanQuote(1, 10000, this)">
+              <div class="plan-card-radio"></div>
+              <div class="plan-card-body">
+                <div class="plan-card-top">
+                  <span class="plan-mini-tag">MICRO</span>
+                  <h4>1 Crédito (Tareas Cortas y Foros)</h4>
+                </div>
+                <p>Para micro-ensayos, fichas de lectura o aportes al foro (1 a 5 págs).</p>
+              </div>
+              <div class="plan-card-price">$10.000 <small>COP</small></div>
             </div>
-          </div>
 
-          <div class="nequi-num-col">
-            <label>VALOR SELECCIONADO:</label>
-            <div class="amount-val-display" id="nequi-amount-display">$50.000 COP</div>
-          </div>
-        </div>
-
-        <div class="nequi-upload-box">
-          <label><b>Subir Recibo o Comprobante Nequi (PDF, JPG, PNG) para Activación OCR:</b></label>
-          <div class="receipt-dropzone" id="drop-receipt">
-            <input type="file" id="file-nequi-receipt" accept=".pdf,.jpg,.jpeg,.png" />
-            <div class="dropzone-label-wrap">
-              <span>📎</span>
-              <span id="receipt-file-label">Arrastra aquí el comprobante de pago Nequi</span>
+            <div class="modal-plan-card" onclick="selectPlanQuote(2, 20000, this)">
+              <div class="plan-card-radio"></div>
+              <div class="plan-card-body">
+                <div class="plan-card-top">
+                  <span class="plan-mini-tag">BÁSICO</span>
+                  <h4>2 Créditos (Tarea Regular o Corrección)</h4>
+                </div>
+                <p>Para materias regulares de curso o corregir hasta 50 págs completas.</p>
+              </div>
+              <div class="plan-card-price">$20.000 <small>COP</small></div>
             </div>
+
+            <div class="modal-plan-card active" onclick="selectPlanQuote(5, 50000, this)">
+              <div class="plan-card-radio"></div>
+              <div class="plan-card-body">
+                <div class="plan-card-top">
+                  <span class="plan-mini-tag lime">MÁS POPULAR</span>
+                  <h4>5 Créditos (Paquete Semestral)</h4>
+                </div>
+                <p>Rinde para 2 a 3 tareas completas de 30 págs o tesis estándar.</p>
+              </div>
+              <div class="plan-card-price">$50.000 <small>COP</small></div>
+            </div>
+
+            <div class="modal-plan-card" onclick="selectPlanQuote(10, 100000, this)">
+              <div class="plan-card-radio"></div>
+              <div class="plan-card-body">
+                <div class="plan-card-top">
+                  <span class="plan-mini-tag">MACRO-TESIS</span>
+                  <h4>10 Créditos (Tesis de Grado o Posgrado)</h4>
+                </div>
+                <p>Para investigaciones extensas (> 140 págs) con auditoría en Excel.</p>
+              </div>
+              <div class="plan-card-price">$100.000 <small>COP</small></div>
+            </div>
+
           </div>
-          <button class="btn-verify-receipt-wompi" id="btn-scan-receipt" onclick="uploadAndVerifyReceipt()">
-            🔍 Escanear Recibo y Dar de Alta Automáticamente
-          </button>
         </div>
 
-        <div class="nequi-whatsapp-row">
-          <span>¿Dudas con tu pago o soporte directo?</span>
-          <a href="https://wa.me/573207105618?text=Hola,%20acabo%20de%20hacer%20la%20transferencia%20en%20Nequi%20para%20AcademicPro" target="_blank" class="wompi-whatsapp-link">
-            💬 WhatsApp (320 710 5618)
-          </a>
+        <!-- COLUMNA DERECHA: TRANSFERENCIA Y VALIDACIÓN -->
+        <div class="recharge-checkout-col">
+          <span class="recharge-col-label">2. Transferencia y Activación</span>
+
+          <div class="recharge-summary-box">
+            
+            <div class="summary-price-header">
+              <span class="summary-plan-badge" id="recharge-plan-label">Paquete 5 Créditos</span>
+              <span class="summary-total-val" id="nequi-amount-display">$50.000 COP</span>
+            </div>
+
+            <!-- BLOQUE DE TRANSFERENCIA NEQUI -->
+            <div class="nequi-transfer-panel">
+              <div class="nequi-transfer-header">
+                <span>📱 Nequi Oficial</span>
+                <span class="verified-tag">✔ 0% Comisión</span>
+              </div>
+
+              <div class="nequi-copy-row">
+                <span class="nequi-num-label">Número Nequi:</span>
+                <div class="copy-field">
+                  <strong id="nequi-number-text">320 710 5618</strong>
+                  <button type="button" class="btn-copy-chip" onclick="copyNequiNumber()" title="Copiar número Nequi">Copiar</button>
+                </div>
+              </div>
+
+              <!-- SUBIDA DE COMPROBANTE OCR -->
+              <div class="nequi-upload-box-compact">
+                <label class="upload-label-compact">Adjunta tu comprobante para dar de alta:</label>
+                <div class="receipt-dropzone-compact" id="drop-receipt" onclick="document.getElementById('file-nequi-receipt').click()">
+                  <input type="file" id="file-nequi-receipt" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" onchange="handleReceiptFileChange(this)" />
+                  <span class="drop-icon">📎</span>
+                  <span id="receipt-file-label" class="drop-text">Seleccionar comprobante (PDF o Foto)</span>
+                </div>
+                
+                <button type="button" class="btn-inst-primary" id="btn-scan-receipt" onclick="uploadAndVerifyReceipt()" style="height: 42px; font-size: 13px;">
+                  <span>🔍 Validar Comprobante y Activar</span>
+                  <span class="btn-arrow">→</span>
+                </button>
+              </div>
+
+              <!-- SOPORTE ENLACE DIRECTO -->
+              <div class="recharge-support-link-row">
+                <span>¿Dudas o reporte manual?</span>
+                <a href="https://wa.me/573207105618?text=Hola,%20acabo%20de%20hacer%20la%20transferencia%20en%20Nequi%20para%20AcademicPro" target="_blank" class="inst-link-subtle">
+                  WhatsApp Directo (+57 320 710 5618)
+                </a>
+              </div>
+
+            </div>
+
+          </div>
         </div>
+
       </div>
 
     </div>
@@ -601,192 +644,192 @@
     </button>
   </div>
 
-  <!-- MODAL DE AUTENTICACIÓN / REGISTRO ESTILO INSTITUCIONAL LIMPIO (ZERO SCROLL) -->
+  <!-- ============================================================== -->
+  <!-- MODAL 1: INICIO DE SESIÓN INSTITUCIONAL LIMPIO (ZERO SCROLL) -->
+  <!-- ============================================================== -->
   <div class="wompi-modal-overlay" id="modal-auth" style="display: none;">
     <div class="institutional-login-card" id="auth-modal-card">
       
       <!-- BOTÓN CERRAR SUPERIOR DERECHO -->
-      <button class="btn-modal-close-round" onclick="closeAuthModal()" title="Cerrar modal">&times;</button>
+      <button class="btn-modal-close-round" onclick="closeLoginModal()" title="Cerrar modal">&times;</button>
 
-      <!-- PESTAÑAS SUPERIORES DE ALTERNANCIA RÁPIDA -->
-      <div class="inst-tabs-nav">
-        <button type="button" id="tab-btn-login" class="inst-tab-btn active" onclick="switchAuthMode('login')">
-          Iniciar sesión
-        </button>
-        <button type="button" id="tab-btn-register" class="inst-tab-btn" onclick="switchAuthMode('register')">
-          Crea tu cuenta
-        </button>
+      <div class="inst-card-header">
+        <h2 class="inst-card-title">Iniciar sesión</h2>
+        <p class="inst-card-subtitle">Accede con tus credenciales institucionales</p>
       </div>
 
-      <!-- VISTA 1: INICIAR SESIÓN -->
-      <div id="panel-login" class="inst-panel-view">
-        <div class="inst-card-header">
-          <h2 class="inst-card-title">Iniciar sesión</h2>
-          <p class="inst-card-subtitle">Accede con tus credenciales institucionales</p>
+      <form id="auth-login-form" onsubmit="handleLoginSubmit(event)">
+        <div class="inst-form-group">
+          <label for="auth-email-input">Correo institucional o registrado</label>
+          <div class="inst-input-wrapper">
+            <span class="inst-input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+              </svg>
+            </span>
+            <input type="email" id="auth-email-input" required placeholder="usuario@institucion.edu" />
+          </div>
         </div>
 
-        <form id="auth-login-form" onsubmit="handleLoginSubmit(event)">
-          <div class="inst-form-group">
-            <label for="auth-email-input">Correo institucional o registrado</label>
-            <div class="inst-input-wrapper">
-              <span class="inst-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                </svg>
-              </span>
-              <input type="email" id="auth-email-input" required placeholder="usuario@institucion.edu" />
-            </div>
+        <div class="inst-form-group">
+          <label for="auth-pwd-input">Contraseña</label>
+          <div class="inst-input-wrapper">
+            <span class="inst-input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
+            <input type="password" id="auth-pwd-input" required placeholder="••••••••" />
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('auth-pwd-input')" title="Mostrar u ocultar contraseña">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
           </div>
+        </div>
 
-          <div class="inst-form-group">
-            <label for="auth-pwd-input">Contraseña</label>
-            <div class="inst-input-wrapper">
-              <span class="inst-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </span>
-              <input type="password" id="auth-pwd-input" required placeholder="••••••••" />
-              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('auth-pwd-input')" title="Mostrar u ocultar contraseña">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </button>
-            </div>
-          </div>
+        <div class="inst-forgot-row">
+          <a href="https://wa.me/573207105618?text=Hola,%20olvid%C3%A9%20mi%20contrase%C3%B1a%20de%20AcademicPro" target="_blank" class="inst-link-subtle">¿Olvidaste tu contraseña?</a>
+        </div>
 
-          <div class="inst-forgot-row">
-            <a href="https://wa.me/573207105618?text=Hola,%20olvid%C3%A9%20mi%20contrase%C3%B1a%20de%20AcademicPro" target="_blank" class="inst-link-subtle">¿Olvidaste tu contraseña?</a>
-          </div>
-
-          <button type="submit" id="auth-submit-btn" class="btn-inst-primary">
-            <span>Iniciar sesión</span>
-            <span class="btn-arrow">→</span>
-          </button>
-
-          <p id="auth-msg-feedback" class="auth-feedback-text"></p>
-        </form>
-
-        <div class="inst-divider-text"><span>¿No tienes una cuenta aún?</span></div>
-
-        <button type="button" onclick="switchAuthMode('register')" class="btn-inst-secondary">
-          <span>Crea tu cuenta</span>
-          <span style="font-weight: 700; font-size: 11px; background: #DCFCE7; color: #15803D; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">+2 Créditos gratis</span>
+        <button type="submit" id="auth-submit-btn" class="btn-inst-primary">
+          <span>Iniciar sesión</span>
+          <span class="btn-arrow">→</span>
         </button>
 
-        <div class="inst-footer-row" style="margin-top: 14px;">
-          <span>¿Problemas de acceso?</span>
-          <a href="https://wa.me/573207105618?text=Hola,%20necesito%20soporte%20para%20acceder%20a%20mi%20cuenta" target="_blank" class="inst-link-subtle" style="font-weight: 700;">Contactar a soporte</a>
-        </div>
+        <p id="auth-msg-feedback" class="auth-feedback-text"></p>
+      </form>
+
+      <div class="inst-divider-text"><span>¿No tienes una cuenta aún?</span></div>
+
+      <button type="button" onclick="openRegisterModal()" class="btn-inst-secondary">
+        <span>Crea tu cuenta</span>
+        <span style="font-weight: 700; font-size: 11px; background: #DCFCE7; color: #15803D; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">+2 Créditos gratis</span>
+      </button>
+
+      <div class="inst-footer-row" style="margin-top: 14px;">
+        <span>¿Problemas de acceso?</span>
+        <a href="https://wa.me/573207105618?text=Hola,%20necesito%20soporte%20para%20acceder%20a%20mi%20cuenta" target="_blank" class="inst-link-subtle" style="font-weight: 700;">Contactar a soporte</a>
       </div>
 
-      <!-- VISTA 2: FORMULARIO DE REGISTRO COMPLETO (EL FORMULARIO MÁS LARGUITO) -->
-      <div id="panel-register" class="inst-panel-view" style="display: none;">
-        <div class="inst-card-header">
-          <h2 class="inst-card-title">Crea tu cuenta</h2>
-          <p class="inst-card-subtitle">Recibe 2 créditos de bienvenida para maquetar tus entregas</p>
-        </div>
-
-        <form id="auth-reg-form" onsubmit="handleRegisterSubmit(event)">
-          
-          <!-- Correo institucional -->
-          <div class="inst-form-group">
-            <label for="reg-email-input">Correo institucional o personal</label>
-            <div class="inst-input-wrapper">
-              <span class="inst-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                </svg>
-              </span>
-              <input type="email" id="reg-email-input" required placeholder="tu_correo@institucion.edu" />
-            </div>
-          </div>
-
-          <!-- Alias y Universidad en 2 columnas -->
-          <div class="inst-form-row-2col">
-            <div class="inst-form-group">
-              <label for="reg-alias-input">Alias / Autor</label>
-              <div class="inst-input-wrapper">
-                <span class="inst-input-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </span>
-                <input type="text" id="reg-alias-input" required placeholder="Ej. Estudiante_2026" />
-              </div>
-            </div>
-
-            <div class="inst-form-group">
-              <label for="reg-inst-select">Institución</label>
-              <div class="inst-input-wrapper">
-                <span class="inst-input-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-                </span>
-                <select id="reg-inst-select" class="inst-select-clean">
-                  <option value="UNAD">UNAD</option>
-                  <option value="SENA">SENA</option>
-                  <option value="Universidad Nacional">U. Nacional</option>
-                  <option value="Universidad de Antioquia">U. Antioquia</option>
-                  <option value="Otra">Otra Institución</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contraseña -->
-          <div class="inst-form-group">
-            <label for="reg-pwd-input">Contraseña</label>
-            <div class="inst-input-wrapper">
-              <span class="inst-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </span>
-              <input type="password" id="reg-pwd-input" required placeholder="Mínimo 4 caracteres" />
-              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('reg-pwd-input')" title="Ver u ocultar contraseña">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Confirmar Contraseña -->
-          <div class="inst-form-group">
-            <label for="reg-pwd-confirm-input">Confirmar Contraseña</label>
-            <div class="inst-input-wrapper">
-              <span class="inst-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </span>
-              <input type="password" id="reg-pwd-confirm-input" required placeholder="Repite tu contraseña" />
-              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('reg-pwd-confirm-input')" title="Ver u ocultar contraseña">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              </button>
-            </div>
-          </div>
-
-          <button type="submit" id="auth-reg-submit-btn" class="btn-inst-primary">
-            <span>Crear mi cuenta gratis</span>
-            <span class="btn-arrow">→</span>
-          </button>
-
-          <p id="auth-reg-feedback" class="auth-feedback-text"></p>
-        </form>
-
-        <div class="inst-footer-row" style="margin-top: 14px;">
-          <span>¿Ya tienes una cuenta?</span>
-          <button type="button" onclick="switchAuthMode('login')" class="inst-link-highlight">Iniciar sesión aquí</button>
-        </div>
-
-      </div>
-
-      <!-- CRÉDITOS INFERIORES INSTITUCIONALES -->
       <div class="inst-card-bottom-tag">
-        <span>Asesoría personalizada por AcademicPro</span>
+        <span>Asesoría personalizada por AcademicPro (+57 320 710 5618)</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL 2: REGISTRO INSTITUCIONAL DEDICADO (EL FORMULARIO LARGUITO) -->
+  <!-- ============================================================== -->
+  <div class="wompi-modal-overlay" id="modal-register" style="display: none;">
+    <div class="institutional-login-card institutional-register-card" id="register-modal-card">
+      
+      <!-- BOTÓN CERRAR SUPERIOR DERECHO -->
+      <button class="btn-modal-close-round" onclick="closeRegisterModal()" title="Cerrar modal">&times;</button>
+
+      <div class="inst-card-header">
+        <h2 class="inst-card-title">Crea tu cuenta</h2>
+        <p class="inst-card-subtitle">Recibe 2 créditos de bienvenida para maquetar tus entregas</p>
+      </div>
+
+      <form id="auth-reg-form" onsubmit="handleRegisterSubmit(event)">
+        
+        <!-- Correo institucional -->
+        <div class="inst-form-group">
+          <label for="reg-email-input">Correo institucional o personal</label>
+          <div class="inst-input-wrapper">
+            <span class="inst-input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+              </svg>
+            </span>
+            <input type="email" id="reg-email-input" required placeholder="tu_correo@institucion.edu" />
+          </div>
+        </div>
+
+        <!-- Alias y Universidad en 2 columnas -->
+        <div class="inst-form-row-2col">
+          <div class="inst-form-group">
+            <label for="reg-alias-input">Alias / Autor</label>
+            <div class="inst-input-wrapper">
+              <span class="inst-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </span>
+              <input type="text" id="reg-alias-input" required placeholder="Ej. Estudiante_2026" />
+            </div>
+          </div>
+
+          <div class="inst-form-group">
+            <label for="reg-inst-select">Institución</label>
+            <div class="inst-input-wrapper">
+              <span class="inst-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+              </span>
+              <select id="reg-inst-select" class="inst-select-clean">
+                <option value="UNAD">UNAD</option>
+                <option value="SENA">SENA</option>
+                <option value="Universidad Nacional">U. Nacional</option>
+                <option value="Universidad de Antioquia">U. Antioquia</option>
+                <option value="Otra">Otra Institución</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="inst-form-group">
+          <label for="reg-pwd-input">Contraseña</label>
+          <div class="inst-input-wrapper">
+            <span class="inst-input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
+            <input type="password" id="reg-pwd-input" required placeholder="Mínimo 4 caracteres" />
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('reg-pwd-input')" title="Ver u ocultar contraseña">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirmar Contraseña -->
+        <div class="inst-form-group">
+          <label for="reg-pwd-confirm-input">Confirmar Contraseña</label>
+          <div class="inst-input-wrapper">
+            <span class="inst-input-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
+            <input type="password" id="reg-pwd-confirm-input" required placeholder="Repite tu contraseña" />
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('reg-pwd-confirm-input')" title="Ver u ocultar contraseña">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="auth-reg-submit-btn" class="btn-inst-primary">
+          <span>Crear mi cuenta gratis</span>
+          <span class="btn-arrow">→</span>
+        </button>
+
+        <p id="auth-reg-feedback" class="auth-feedback-text"></p>
+      </form>
+
+      <div class="inst-footer-row" style="margin-top: 14px;">
+        <span>¿Ya tienes una cuenta registrada?</span>
+        <button type="button" onclick="openLoginModal()" class="inst-link-highlight">Iniciar sesión aquí</button>
+      </div>
+
+      <div class="inst-card-bottom-tag">
+        <span>Asesoría personalizada por AcademicPro (+57 320 710 5618)</span>
       </div>
 
     </div>
