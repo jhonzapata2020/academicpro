@@ -1321,3 +1321,327 @@ body.wompi-theme {
   align-items: center;
   gap: 10px;
 }
+
+/* =========================================================================
+   DISEÑO RESPONSIVO MÓVIL Y TABLET (MOBILE-FIRST POLISH)
+   ========================================================================= */
+
+@media (max-width: 900px) {
+  body.wompi-theme {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .wompi-main-viewport {
+    padding: 16px 16px 90px;
+    justify-content: flex-start;
+  }
+
+  .state-2-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  body.wompi-theme {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Header móvil compacto */
+  .wompi-header.compact {
+    padding: 0 14px;
+    height: 52px;
+  }
+
+  .wompi-breadcrumb-separator,
+  .wompi-screen-title {
+    display: none;
+  }
+
+  .wompi-header-right {
+    gap: 8px;
+  }
+
+  .wompi-credit-wallet {
+    padding: 4px 8px;
+    font-size: 10.5px;
+  }
+
+  .wompi-btn-recharge {
+    padding: 5px 10px;
+    font-size: 10.5px;
+  }
+
+  .wompi-avatar-circle {
+    width: 26px;
+    height: 26px;
+    font-size: 10px;
+  }
+
+  /* Barra de confianza institucional en móvil */
+  .academic-trust-strip {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 14px;
+    gap: 5px;
+    font-size: 10.5px;
+    line-height: 1.35;
+  }
+
+  .trust-contact-link {
+    font-size: 10.5px;
+    word-break: break-word;
+  }
+
+  /* Contenedor principal */
+  .wompi-main-viewport {
+    padding: 12px 10px 100px;
+    justify-content: flex-start;
+  }
+
+  .wompi-viewport-card {
+    padding: 18px 14px;
+    border-radius: 18px;
+    gap: 14px;
+  }
+
+  .wompi-card-header.compact h1 {
+    font-size: 20px;
+    letter-spacing: -0.4px;
+  }
+
+  .wompi-card-header.compact p {
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+
+  /* Cuadrícula de tarjetas en columna única vertical */
+  .wompi-selection-grid.compact {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .wompi-card-radio {
+    padding: 16px 14px;
+    border-width: 2.5px;
+    gap: 12px;
+  }
+
+  .card-radio-title {
+    font-size: 16px;
+  }
+
+  .card-radio-sub {
+    font-size: 11.5px;
+  }
+
+  .btn-card-upload {
+    padding: 11px 14px;
+    font-size: 12.5px;
+  }
+
+  /* Estado 2: Configuración */
+  .state-2-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .state-2-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .file-summary-card {
+    padding: 14px;
+  }
+
+  .f-name-text {
+    max-width: 200px;
+  }
+
+  .instructions-card-compact {
+    padding: 14px;
+  }
+
+  .textarea-compact {
+    height: 90px;
+    font-size: 12px;
+  }
+
+  /* Banner de cotización en cuadrícula 2x2 */
+  .wompi-quote-banner.compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+  }
+
+  .quote-col-sep {
+    display: none;
+  }
+
+  .quote-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .q-val-num {
+    font-size: 17px;
+  }
+
+  .quote-col-btn {
+    grid-column: span 2;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .wompi-btn-action {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .quote-scale-hint {
+    flex-direction: column;
+    font-size: 10.5px !important;
+    text-align: center;
+    padding: 0 4px;
+  }
+
+  /* Tarjeta post-muestra */
+  .post-preview-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .post-preview-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .post-preview-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Estado 3: Resultados */
+  .results-downloads-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-dl-wompi {
+    width: 100%;
+    padding: 12px 14px;
+  }
+
+  /* Modal de recarga en móvil */
+  .wompi-modal-card {
+    width: 95vw;
+    padding: 18px 14px;
+    max-height: 94vh;
+    border-radius: 18px;
+    gap: 12px;
+  }
+
+  .modal-plan-row {
+    padding: 10px 12px;
+  }
+
+  .plan-info h4 {
+    font-size: 11.5px;
+  }
+
+  .plan-price-num {
+    font-size: 14px;
+  }
+
+  .nequi-nums-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .nequi-whatsapp-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  /* Visor efímero en móvil */
+  .ephemeral-viewer-overlay {
+    padding: 8px;
+  }
+
+  .ephemeral-sheet-wrapper {
+    width: 100vw;
+    max-width: 100vw;
+    height: 95vh;
+    border-radius: 10px;
+  }
+
+  .ephemeral-sheet-scroll {
+    padding: 24px 16px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .ephemeral-watermark {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+
+  /* Speed Dial / FAB en móvil con safe-area */
+  .speed-dial-wrapper {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+  }
+
+  .speed-dial-btn-main {
+    width: 52px;
+    height: 52px;
+  }
+
+  .speed-dial-sub-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .speed-dial-tooltip {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .wompi-brand-title {
+    font-size: 15px;
+  }
+
+  .wompi-credit-wallet span.wompi-wallet-icon {
+    display: none;
+  }
+
+  .wompi-card-header.compact h1 {
+    font-size: 18px;
+  }
+
+  .preview-cta-strip {
+    flex-direction: column;
+  }
+
+  .preview-cta-strip button {
+    width: 100%;
+  }
+}
