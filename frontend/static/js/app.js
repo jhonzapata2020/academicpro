@@ -163,7 +163,7 @@ function resetToInitialState() {
   if (inSec) inSec.value = "";
 
   const secLbl = document.getElementById("btn-secondary-label");
-  if (secLbl) secLbl.textContent = "📎 + Agregar Rúbrica o Notas del Jurado (.xlsx/.pdf)";
+  if (secLbl) secLbl.textContent = "📎 + Agregar Rúbrica o Retroalimentación del Tutor (.xlsx/.pdf)";
 }
 
 /* =========================================================================
