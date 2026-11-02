@@ -699,8 +699,8 @@ function fallbackWhatsApp(fileName, pages, tutorNotes) {
   window.open(`https://wa.me/573207105618?text=${msg}`, "_blank");
 }
 
-function togglePasswordVisibility() {
-  const input = document.getElementById("auth-pwd-input");
+function togglePasswordVisibility(id = "auth-pwd-input") {
+  const input = document.getElementById(id);
   if (!input) return;
   input.type = input.type === "password" ? "text" : "password";
 }
@@ -735,20 +735,26 @@ function switchAuthMode(mode) {
   const tabRegister = document.getElementById("tab-btn-register");
   const panelLogin = document.getElementById("panel-login");
   const panelRegister = document.getElementById("panel-register");
-  const title = document.getElementById("auth-modal-title");
+
+  const loginFeedback = document.getElementById("auth-msg-feedback");
+  const regFeedback = document.getElementById("auth-reg-feedback");
+  if (loginFeedback) loginFeedback.style.display = "none";
+  if (regFeedback) regFeedback.style.display = "none";
 
   if (mode === "register") {
     if (tabRegister) tabRegister.classList.add("active");
     if (tabLogin) tabLogin.classList.remove("active");
     if (panelLogin) panelLogin.style.display = "none";
     if (panelRegister) panelRegister.style.display = "block";
-    if (title) title.textContent = "Registro y Activación";
+    const regEmail = document.getElementById("reg-email-input");
+    if (regEmail) regEmail.focus();
   } else {
     if (tabLogin) tabLogin.classList.add("active");
     if (tabRegister) tabRegister.classList.remove("active");
     if (panelLogin) panelLogin.style.display = "block";
     if (panelRegister) panelRegister.style.display = "none";
-    if (title) title.textContent = "Acceso Estudiante";
+    const loginEmail = document.getElementById("auth-email-input");
+    if (loginEmail) loginEmail.focus();
   }
 }
 
@@ -792,43 +798,130 @@ window.addEventListener("click", (e) => {
   }
 });
 
-async function handleAuthSubmit(e) {
-  e.preventDefault();
-  const email = document.getElementById("auth-email-input").value.trim();
-  const password = document.getElementById("auth-pwd-input").value.trim();
-  const alias = document.getElementById("auth-alias-input")?.value?.trim() || "Estudiante";
-  const inst = document.getElementById("auth-inst-select")?.value || "UNAD";
+async function handleLoginSubmit(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById("auth-email-input");
+  const pwdInput = document.getElementById("auth-pwd-input");
   const feedback = document.getElementById("auth-msg-feedback");
+  const submitBtn = document.getElementById("auth-submit-btn");
 
-  feedback.style.display = "block";
-  feedback.style.color = "#38BDF8";
-  feedback.textContent = "Verificando...";
+  const email = emailInput ? emailInput.value.trim() : "";
+  const password = pwdInput ? pwdInput.value.trim() : "";
+
+  if (feedback) {
+    feedback.style.display = "block";
+    feedback.style.color = "#014165";
+    feedback.textContent = "Verificando credenciales...";
+  }
+  if (submitBtn) submitBtn.disabled = true;
 
   try {
-    const endpoint = currentAuthMode === "register" ? "/api/auth/register" : "/api/auth/login";
-    const payload = currentAuthMode === "register" 
-      ? { email, password, username_alias: alias, institution: inst, device_fingerprint: getDeviceFingerprint() }
-      : { email, password };
-
-    const res = await fetch(endpoint, {
+    const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ email, password })
     });
-
     const data = await res.json();
     if (!res.ok) {
-      feedback.style.color = "#EF4444";
-      feedback.textContent = data.detail || "Error en la autenticación.";
+      if (feedback) {
+        feedback.style.color = "#DC2626";
+        feedback.textContent = data.detail || "Credenciales inválidas. Revisa tu correo o contraseña.";
+      }
       return;
     }
 
-    // Guardar sesión en localStorage
     const user = data.user;
     localStorage.setItem("academicpro_user", JSON.stringify(user));
 
-    feedback.style.color = "#34D399";
-    feedback.textContent = data.user.message || "¡Bienvenido! Sesión iniciada con éxito.";
+    if (feedback) {
+      feedback.style.color = "#16A34A";
+      feedback.textContent = "¡Sesión iniciada con éxito! Bienvenido.";
+    }
+
+    setTimeout(() => {
+      closeAuthModal();
+      applyUserSession(user);
+    }, 600);
+
+  } catch (err) {
+    if (feedback) {
+      feedback.style.color = "#DC2626";
+      feedback.textContent = "Error al conectar con el servidor.";
+    }
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+async function handleRegisterSubmit(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById("reg-email-input");
+  const aliasInput = document.getElementById("reg-alias-input");
+  const instSelect = document.getElementById("reg-inst-select");
+  const pwdInput = document.getElementById("reg-pwd-input");
+  const confirmPwdInput = document.getElementById("reg-pwd-confirm-input");
+  const feedback = document.getElementById("auth-reg-feedback");
+  const submitBtn = document.getElementById("auth-reg-submit-btn");
+
+  const email = emailInput ? emailInput.value.trim() : "";
+  const username_alias = aliasInput ? aliasInput.value.trim() : "Estudiante";
+  const institution = instSelect ? instSelect.value : "UNAD";
+  const password = pwdInput ? pwdInput.value.trim() : "";
+  const confirmPassword = confirmPwdInput ? confirmPwdInput.value.trim() : "";
+
+  if (password.length < 4) {
+    if (feedback) {
+      feedback.style.display = "block";
+      feedback.style.color = "#DC2626";
+      feedback.textContent = "La contraseña debe tener al menos 4 caracteres.";
+    }
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    if (feedback) {
+      feedback.style.display = "block";
+      feedback.style.color = "#DC2626";
+      feedback.textContent = "Las contraseñas no coinciden. Por favor verifícalas.";
+    }
+    return;
+  }
+
+  if (feedback) {
+    feedback.style.display = "block";
+    feedback.style.color = "#014165";
+    feedback.textContent = "Creando tu cuenta y asignando tus 2 créditos de bienvenida...";
+  }
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        username_alias,
+        institution,
+        password,
+        device_fingerprint: getDeviceFingerprint()
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      if (feedback) {
+        feedback.style.color = "#DC2626";
+        feedback.textContent = data.detail || "Error al crear la cuenta. Intenta de nuevo.";
+      }
+      return;
+    }
+
+    const user = data.user;
+    localStorage.setItem("academicpro_user", JSON.stringify(user));
+
+    if (feedback) {
+      feedback.style.color = "#16A34A";
+      feedback.textContent = user.message || "¡Cuenta creada con éxito! 2 Créditos asignados.";
+    }
 
     setTimeout(() => {
       closeAuthModal();
@@ -836,8 +929,20 @@ async function handleAuthSubmit(e) {
     }, 700);
 
   } catch (err) {
-    feedback.style.color = "#EF4444";
-    feedback.textContent = "Error al conectar con el servidor.";
+    if (feedback) {
+      feedback.style.color = "#DC2626";
+      feedback.textContent = "Error de red al procesar el registro.";
+    }
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+async function handleAuthSubmit(e) {
+  if (currentAuthMode === "register") {
+    return handleRegisterSubmit(e);
+  } else {
+    return handleLoginSubmit(e);
   }
 }
 

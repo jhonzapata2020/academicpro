@@ -608,6 +608,16 @@
       <!-- BOTÓN CERRAR SUPERIOR DERECHO -->
       <button class="btn-modal-close-round" onclick="closeAuthModal()" title="Cerrar modal">&times;</button>
 
+      <!-- PESTAÑAS SUPERIORES DE ALTERNANCIA RÁPIDA -->
+      <div class="inst-tabs-nav">
+        <button type="button" id="tab-btn-login" class="inst-tab-btn active" onclick="switchAuthMode('login')">
+          Iniciar sesión
+        </button>
+        <button type="button" id="tab-btn-register" class="inst-tab-btn" onclick="switchAuthMode('register')">
+          Crea tu cuenta
+        </button>
+      </div>
+
       <!-- VISTA 1: INICIAR SESIÓN -->
       <div id="panel-login" class="inst-panel-view">
         <div class="inst-card-header">
@@ -615,9 +625,9 @@
           <p class="inst-card-subtitle">Accede con tus credenciales institucionales</p>
         </div>
 
-        <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+        <form id="auth-login-form" onsubmit="handleLoginSubmit(event)">
           <div class="inst-form-group">
-            <label for="auth-email-input">Correo institucional</label>
+            <label for="auth-email-input">Correo institucional o registrado</label>
             <div class="inst-input-wrapper">
               <span class="inst-input-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -639,7 +649,7 @@
                 </svg>
               </span>
               <input type="password" id="auth-pwd-input" required placeholder="••••••••" />
-              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility()" title="Mostrar u ocultar contraseña">
+              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('auth-pwd-input')" title="Mostrar u ocultar contraseña">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
@@ -660,46 +670,118 @@
           <p id="auth-msg-feedback" class="auth-feedback-text"></p>
         </form>
 
-        <div class="inst-footer-row">
+        <div class="inst-divider-text"><span>¿No tienes una cuenta aún?</span></div>
+
+        <button type="button" onclick="switchAuthMode('register')" class="btn-inst-secondary">
+          <span>Crea tu cuenta</span>
+          <span style="font-weight: 700; font-size: 11px; background: #DCFCE7; color: #15803D; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">+2 Créditos gratis</span>
+        </button>
+
+        <div class="inst-footer-row" style="margin-top: 14px;">
           <span>¿Problemas de acceso?</span>
-          <button type="button" onclick="switchAuthMode('register')" class="inst-link-highlight">Contactar a soporte</button>
+          <a href="https://wa.me/573207105618?text=Hola,%20necesito%20soporte%20para%20acceder%20a%20mi%20cuenta" target="_blank" class="inst-link-subtle" style="font-weight: 700;">Contactar a soporte</a>
         </div>
       </div>
 
-      <!-- VISTA 2: REGISTRO Y ACTIVACIÓN CON SOPORTE -->
+      <!-- VISTA 2: FORMULARIO DE REGISTRO COMPLETO (EL FORMULARIO MÁS LARGUITO) -->
       <div id="panel-register" class="inst-panel-view" style="display: none;">
         <div class="inst-card-header">
-          <h2 class="inst-card-title">Registro y Soporte</h2>
-          <p class="inst-card-subtitle">Activación directa de cuenta y créditos de bienvenida</p>
+          <h2 class="inst-card-title">Crea tu cuenta</h2>
+          <p class="inst-card-subtitle">Recibe 2 créditos de bienvenida para maquetar tus entregas</p>
         </div>
 
-        <div class="inst-wa-card">
-          <div class="inst-wa-badge">🛡️ Asignación Personalizada</div>
-          <p class="inst-wa-desc">
-            Para garantizar tu confidencialidad y asignar tus <b>2 Créditos Gratuitos</b>, el registro se realiza directamente con el equipo de soporte:
-          </p>
-
-          <div class="inst-wa-contact-box">
-            <div class="inst-wa-avatar">AP</div>
-            <div class="inst-wa-meta">
-              <span class="inst-wa-label">Línea Oficial de Soporte y Registro</span>
-              <strong class="inst-wa-phone">+57 320 710 5618</strong>
-              <span class="inst-wa-status">🟢 Atención Inmediata en WhatsApp</span>
+        <form id="auth-reg-form" onsubmit="handleRegisterSubmit(event)">
+          
+          <!-- Correo institucional -->
+          <div class="inst-form-group">
+            <label for="reg-email-input">Correo institucional o personal</label>
+            <div class="inst-input-wrapper">
+              <span class="inst-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                </svg>
+              </span>
+              <input type="email" id="reg-email-input" required placeholder="tu_correo@institucion.edu" />
             </div>
           </div>
 
-          <a href="https://wa.me/573207105618?text=Hola,%20deseo%20registrarme%20en%20AcademicPro%20y%20activar%20mis%20cr%C3%A9ditos%20de%20bienvenida" 
-             target="_blank" 
-             class="btn-inst-primary">
-            <span>Contactar a Soporte por WhatsApp</span>
-            <span class="btn-arrow">→</span>
-          </a>
-        </div>
+          <!-- Alias y Universidad en 2 columnas -->
+          <div class="inst-form-row-2col">
+            <div class="inst-form-group">
+              <label for="reg-alias-input">Alias / Autor</label>
+              <div class="inst-input-wrapper">
+                <span class="inst-input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </span>
+                <input type="text" id="reg-alias-input" required placeholder="Ej. Estudiante_2026" />
+              </div>
+            </div>
 
-        <div class="inst-footer-row" style="margin-top: 16px;">
-          <span>¿Ya tienes credenciales asignadas?</span>
+            <div class="inst-form-group">
+              <label for="reg-inst-select">Institución</label>
+              <div class="inst-input-wrapper">
+                <span class="inst-input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                </span>
+                <select id="reg-inst-select" class="inst-select-clean">
+                  <option value="UNAD">UNAD</option>
+                  <option value="SENA">SENA</option>
+                  <option value="Universidad Nacional">U. Nacional</option>
+                  <option value="Universidad de Antioquia">U. Antioquia</option>
+                  <option value="Otra">Otra Institución</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="inst-form-group">
+            <label for="reg-pwd-input">Contraseña</label>
+            <div class="inst-input-wrapper">
+              <span class="inst-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
+              <input type="password" id="reg-pwd-input" required placeholder="Mínimo 4 caracteres" />
+              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('reg-pwd-input')" title="Ver u ocultar contraseña">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirmar Contraseña -->
+          <div class="inst-form-group">
+            <label for="reg-pwd-confirm-input">Confirmar Contraseña</label>
+            <div class="inst-input-wrapper">
+              <span class="inst-input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
+              <input type="password" id="reg-pwd-confirm-input" required placeholder="Repite tu contraseña" />
+              <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('reg-pwd-confirm-input')" title="Ver u ocultar contraseña">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="auth-reg-submit-btn" class="btn-inst-primary">
+            <span>Crear mi cuenta gratis</span>
+            <span class="btn-arrow">→</span>
+          </button>
+
+          <p id="auth-reg-feedback" class="auth-feedback-text"></p>
+        </form>
+
+        <div class="inst-footer-row" style="margin-top: 14px;">
+          <span>¿Ya tienes una cuenta?</span>
           <button type="button" onclick="switchAuthMode('login')" class="inst-link-highlight">Iniciar sesión aquí</button>
         </div>
+
       </div>
 
       <!-- CRÉDITOS INFERIORES INSTITUCIONALES -->
