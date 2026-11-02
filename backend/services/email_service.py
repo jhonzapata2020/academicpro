@@ -12,8 +12,21 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 
-STORAGE_EMAILS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "sent_emails"))
-os.makedirs(STORAGE_EMAILS_DIR, exist_ok=True)
+def _get_emails_dir() -> str:
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        tmp_dir = "/tmp/academicpro_storage/sent_emails"
+        os.makedirs(tmp_dir, exist_ok=True)
+        return tmp_dir
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "sent_emails"))
+    try:
+        os.makedirs(base_dir, exist_ok=True)
+        return base_dir
+    except (OSError, PermissionError):
+        tmp_dir = "/tmp/academicpro_storage/sent_emails"
+        os.makedirs(tmp_dir, exist_ok=True)
+        return tmp_dir
+
+STORAGE_EMAILS_DIR = _get_emails_dir()
 
 def _get_smtp_credentials():
     user = os.getenv("SMTP_USER", "").strip()

@@ -13,8 +13,23 @@ import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional, List
 
-DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "academicpro_auth.db"))
-os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+def _get_auth_db_path() -> str:
+    """Retorna la ruta adecuada para la base de datos de usuarios (local o /tmp para Vercel)."""
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        tmp_dir = "/tmp/academicpro_storage"
+        os.makedirs(tmp_dir, exist_ok=True)
+        return os.path.join(tmp_dir, "academicpro_auth.db")
+
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage"))
+    try:
+        os.makedirs(base_dir, exist_ok=True)
+        return os.path.join(base_dir, "academicpro_auth.db")
+    except (OSError, PermissionError):
+        tmp_dir = "/tmp/academicpro_storage"
+        os.makedirs(tmp_dir, exist_ok=True)
+        return os.path.join(tmp_dir, "academicpro_auth.db")
+
+DB_PATH = _get_auth_db_path()
 
 ADMIN_PIN = os.getenv("ADMIN_PIN", "7105") # Clave secreta de Jhon Zapata
 
@@ -23,62 +38,65 @@ def _hash_password(password: str) -> str:
     return hashlib.sha256((password + salt).encode("utf-8")).hexdigest()
 
 def _init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    # Tabla de Usuarios Estudiantes
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id TEXT PRIMARY KEY,
-            email TEXT UNIQUE NOT NULL,
-            username_alias TEXT NOT NULL,
-            institution TEXT NOT NULL DEFAULT 'UNAD',
-            password_hash TEXT NOT NULL,
-            balance INT NOT NULL DEFAULT 2,
-            is_tester BOOLEAN DEFAULT 1,
-            device_fingerprint TEXT,
-            client_ip TEXT,
-            created_at TEXT NOT NULL
-        )
-    """)
-    # Asegurar migración de columnas si la tabla ya existía
     try:
-        cur.execute("ALTER TABLE users ADD COLUMN device_fingerprint TEXT")
-    except Exception:
-        pass
-    try:
-        cur.execute("ALTER TABLE users ADD COLUMN client_ip TEXT")
-    except Exception:
-        pass
-    # Tabla de Historial de Tareas y Documentos
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS user_tasks (
-            id TEXT PRIMARY KEY,
-            user_id TEXT NOT NULL,
-            email TEXT NOT NULL,
-            title TEXT NOT NULL,
-            mode TEXT NOT NULL,
-            docx_filename TEXT,
-            excel_filename TEXT,
-            audit_score INT DEFAULT 100,
-            summary TEXT,
-            created_at TEXT NOT NULL
-        )
-    """)
-    # Tabla de Pagos Nequi Registrados
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS nequi_vouchers (
-            id TEXT PRIMARY KEY,
-            user_id TEXT NOT NULL,
-            email TEXT NOT NULL,
-            package_id TEXT NOT NULL,
-            amount_cop INT NOT NULL,
-            voucher_filename TEXT NOT NULL,
-            status TEXT NOT NULL DEFAULT 'PENDING_APPROVAL',
-            created_at TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        # Tabla de Usuarios Estudiantes
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                username_alias TEXT NOT NULL,
+                institution TEXT NOT NULL DEFAULT 'UNAD',
+                password_hash TEXT NOT NULL,
+                balance INT NOT NULL DEFAULT 2,
+                is_tester BOOLEAN DEFAULT 1,
+                device_fingerprint TEXT,
+                client_ip TEXT,
+                created_at TEXT NOT NULL
+            )
+        """)
+        # Asegurar migración de columnas si la tabla ya existía
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN device_fingerprint TEXT")
+        except Exception:
+            pass
+        try:
+            cur.execute("ALTER TABLE users ADD COLUMN client_ip TEXT")
+        except Exception:
+            pass
+        # Tabla de Historial de Tareas y Documentos
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS user_tasks (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                email TEXT NOT NULL,
+                title TEXT NOT NULL,
+                mode TEXT NOT NULL,
+                docx_filename TEXT,
+                excel_filename TEXT,
+                audit_score INT DEFAULT 100,
+                summary TEXT,
+                created_at TEXT NOT NULL
+            )
+        """)
+        # Tabla de Pagos Nequi Registrados
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS nequi_vouchers (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                email TEXT NOT NULL,
+                package_id TEXT NOT NULL,
+                amount_cop INT NOT NULL,
+                voucher_filename TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'PENDING_APPROVAL',
+                created_at TEXT NOT NULL
+            )
+        """)
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print("Aviso: SQLite temporal para auth en Vercel:", e)
 
 _init_db()
 

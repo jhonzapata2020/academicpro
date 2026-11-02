@@ -12,14 +12,24 @@ import zipfile
 from datetime import datetime
 from typing import Dict, Any, List
 
-STORAGE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage"))
-UPLOADS_DIR = os.path.join(STORAGE_ROOT, "uploads")
-OUTPUTS_DIR = os.path.join(STORAGE_ROOT, "outputs")
-VAULT_PERMANENT_DIR = os.path.join(STORAGE_ROOT, "vault_local_backup")
+def _get_vault_dir(folder_name: str) -> str:
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        tmp_dir = os.path.join("/tmp/academicpro_storage", folder_name)
+        os.makedirs(tmp_dir, exist_ok=True)
+        return tmp_dir
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", folder_name))
+    try:
+        os.makedirs(base_dir, exist_ok=True)
+        return base_dir
+    except (OSError, PermissionError):
+        tmp_dir = os.path.join("/tmp/academicpro_storage", folder_name)
+        os.makedirs(tmp_dir, exist_ok=True)
+        return tmp_dir
 
-os.makedirs(UPLOADS_DIR, exist_ok=True)
-os.makedirs(OUTPUTS_DIR, exist_ok=True)
-os.makedirs(VAULT_PERMANENT_DIR, exist_ok=True)
+STORAGE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage"))
+UPLOADS_DIR = _get_vault_dir("uploads")
+OUTPUTS_DIR = _get_vault_dir("outputs")
+VAULT_PERMANENT_DIR = _get_vault_dir("vault_local_backup")
 
 class VaultManager:
     def get_storage_stats(self) -> Dict[str, Any]:

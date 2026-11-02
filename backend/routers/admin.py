@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from backend.services.vault_manager import vault_manager
 from backend.services.auth_service import auth_service, ADMIN_PIN
+from backend.services.email_service import STORAGE_EMAILS_DIR
 
 router = APIRouter(prefix="/api/admin", tags=["Administración y Bóveda"])
 
@@ -55,7 +56,7 @@ async def get_all_generated_tasks(pin: str = Query(...)):
 @router.get("/preview-email/{filename}")
 async def preview_sent_email(filename: str):
     """Permite previsualizar el diseño de los correos HTML enviados."""
-    email_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "storage", "sent_emails", filename))
+    email_path = os.path.join(STORAGE_EMAILS_DIR, filename)
     if os.path.exists(email_path):
         return FileResponse(email_path, media_type="text/html")
     raise HTTPException(status_code=404, detail="Correo no encontrado.")
