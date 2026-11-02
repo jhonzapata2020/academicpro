@@ -31,7 +31,7 @@ def _get_auth_db_path() -> str:
 
 DB_PATH = _get_auth_db_path()
 
-ADMIN_PIN = os.getenv("ADMIN_PIN", "7105") # Clave secreta de Jhon Zapata
+ADMIN_PIN = os.getenv("ADMIN_PIN", "7105") # Clave secreta del Administrador
 
 def _hash_password(password: str) -> str:
     salt = "academicpro_secret_salt_2026"

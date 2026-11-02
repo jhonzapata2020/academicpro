@@ -107,7 +107,7 @@ class EmailService:
               </div>
             </div>
             <div class="footer">
-              <p>Asesoría personalizada y soporte directo: <strong>+57 320 710 5618</strong> (Jhon Zapata)</p>
+              <p>Asesoría personalizada y soporte directo: <strong>+57 320 710 5618</strong></p>
               <p style="margin: 0;">AcademicPro AI · Privacidad Blindada para Estudiantes Universitarios</p>
             </div>
           </div>

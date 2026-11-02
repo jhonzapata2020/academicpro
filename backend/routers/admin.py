@@ -1,5 +1,5 @@
 """
-Router: Endpoints Administrativos y Bóveda de Backups (Jhon Zapata)
+Router: Endpoints Administrativos y Bóveda de Backups (AcademicPro)
 Permite:
   - Ver estudiantes registrados (Alias, Correo, Institución, Créditos).
   - Recargar créditos manualmente a cualquier estudiante.
@@ -27,7 +27,7 @@ class AddCreditsPayload(BaseModel):
 @router.post("/verify-pin")
 async def verify_admin_pin(payload: PinVerifyPayload):
     if payload.pin == ADMIN_PIN or payload.pin == "3207105618":
-        return {"status": "success", "authorized": True, "admin": "Jhon Zapata"}
+        return {"status": "success", "authorized": True, "admin": "AcademicPro"}
     raise HTTPException(status_code=403, detail="PIN de administrador incorrecto.")
 
 @router.get("/users")

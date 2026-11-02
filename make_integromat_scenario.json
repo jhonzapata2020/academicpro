@@ -127,7 +127,7 @@
           { "name": "Authorization", "value": "Bearer {{env.WHATSAPP_API_TOKEN}}" },
           { "name": "Content-Type", "value": "application/json" }
         ],
-        "body": "{\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{1.payload.celular}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"¡Hola {{1.payload.nombre}}! 👋 Tu documento Word (.docx) ya está disponible para descarga en AcademicPro, completamente maquetado con normas APA 7 y tabla de contenido automática. Cualquier ajuste con tu tutor, me puedes escribir directamente a este chat con Jhon Zapata (+57 320 710 5618). ¡Muchos éxitos en tu entrega! 🎓\"\n  }\n}"
+        "body": "{\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{1.payload.celular}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"¡Hola {{1.payload.nombre}}! 👋 Tu documento Word (.docx) ya está disponible para descarga en AcademicPro, completamente maquetado con normas APA 7 y tabla de contenido automática. Cualquier ajuste con tu tutor, me puedes escribir directamente a este chat de soporte (+57 320 710 5618). ¡Muchos éxitos en tu entrega! 🎓\"\n  }\n}"
       },
       "metadata": {
         "designer": {

@@ -477,7 +477,7 @@ function openEphemeralViewer() {
       </div>
       <div style="margin-top: 50px; font-size: 13px;">
         <p><strong>Autor:</strong> Estudiante Asistido (AcademicPro ID: ${Math.floor(1000 + Math.random() * 9000)})</p>
-        <p><strong>Tutor Asesor:</strong> Jhon Zapata (+57 320 710 5618)</p>
+        <p><strong>Tutor Asesor:</strong> Asesoría Académica Especializada (+57 320 710 5618)</p>
         <p><strong>Fecha de Emisión:</strong> Noviembre de 2026</p>
       </div>
     </div>
@@ -661,7 +661,7 @@ function detachAntiCaptureShield() {
 }
 
 /* =========================================================================
-   8. ENLACE INTERACTIVO WHATSAPP DIRECTO CON JHON ZAPATA (+57 320 710 5618)
+   8. ENLACE INTERACTIVO WHATSAPP DIRECTO (+57 320 710 5618)
    ========================================================================= */
 async function requestPersonalizedAssistance() {
   const fileName = currentUploadedFile ? currentUploadedFile.name : "mi_trabajo.docx";
@@ -694,9 +694,15 @@ async function requestPersonalizedAssistance() {
 
 function fallbackWhatsApp(fileName, pages, tutorNotes) {
   const msg = encodeURIComponent(
-    `Hola Jhon, acabo de subir mi trabajo (${fileName}, ${pages} págs) a AcademicPro y me gustaría cotizar la revisión personalizada contigo. Instrucciones del tutor: '${tutorNotes || "Revisión general y formato APA 7"}'.`
+    `Hola, acabo de subir mi trabajo (${fileName}, ${pages} págs) a AcademicPro y me gustaría cotizar la revisión personalizada. Observaciones: '${tutorNotes || "Revisión general y formato APA 7"}'.`
   );
   window.open(`https://wa.me/573207105618?text=${msg}`, "_blank");
+}
+
+function togglePasswordVisibility() {
+  const input = document.getElementById("auth-pwd-input");
+  if (!input) return;
+  input.type = input.type === "password" ? "text" : "password";
 }
 
 function escapeHtml(str) {

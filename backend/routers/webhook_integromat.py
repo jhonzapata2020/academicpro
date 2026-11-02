@@ -1,6 +1,6 @@
 """
 Router de Integración para Make / Integromat y Enlaces WhatsApp Directos
-Maneja los eventos de notificación, validación semi-asistida y contacto 1 a 1 con Jhon Zapata (+57 320 710 5618).
+Maneja los eventos de notificación, validación semi-asistida y contacto de soporte (+57 320 710 5618).
 """
 
 import os
@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/api/automation", tags=["Automation & Make"])
 
-JHON_WHATSAPP_NUMBER = "573207105618"
+SUPPORT_WHATSAPP_NUMBER = "573207105618"
 INTEGROMAT_WEBHOOK_URL = os.getenv("INTEGROMAT_WEBHOOK_URL", "")
 INTEGROMAT_WEBHOOK_SECRET = os.getenv("INTEGROMAT_WEBHOOK_SECRET", "academicpro_secret_key_2026")
 
@@ -40,30 +40,30 @@ class CustomAssistanceRequest(BaseModel):
 @router.post("/generate-whatsapp-link")
 async def generate_whatsapp_link(req: CustomAssistanceRequest):
     """
-    Genera el enlace interactivo wa.me estructurado para contactar directamente a Jhon Zapata.
+    Genera el enlace interactivo wa.me estructurado para contactar directamente al canal de soporte académico.
     """
     cleaned_phone = req.celular.strip().replace("+", "").replace(" ", "").replace("-", "")
     
     mensaje_texto = (
-        f"Hola Jhon, acabo de subir mi trabajo ({req.nombre_archivo}, {req.paginas} págs) a AcademicPro "
-        f"y me gustaría cotizar la revisión personalizada contigo. "
+        f"Hola, acabo de subir mi trabajo ({req.nombre_archivo}, {req.paginas} págs) a AcademicPro "
+        f"y me gustaría cotizar la revisión personalizada. "
         f"Instrucciones o notas del tutor: '{req.instrucciones or 'Revisión general y formato APA 7'}'."
     )
     
     encoded_message = urllib.parse.quote(mensaje_texto)
-    wa_url = f"https://wa.me/{JHON_WHATSAPP_NUMBER}?text={encoded_message}"
+    wa_url = f"https://wa.me/{SUPPORT_WHATSAPP_NUMBER}?text={encoded_message}"
     
     return {
         "status": "success",
         "whatsapp_url": wa_url,
-        "recipient": f"+{JHON_WHATSAPP_NUMBER} (Jhon Zapata - Tutor Académico)",
+        "recipient": f"+{SUPPORT_WHATSAPP_NUMBER} (Soporte Académico)",
         "message_preview": mensaje_texto
     }
 
 @router.post("/webhook/receive")
 async def receive_integromat_webhook(request: Request, x_signature: Optional[str] = Header(None)):
     """
-    Recibe la confirmación desde Integromat (Make) cuando Jhon aprueba un pago vía Telegram/WhatsApp.
+    Recibe la confirmación desde Integromat (Make) cuando el administrador aprueba un pago vía Telegram/WhatsApp.
     Valida firma HMAC y libera el documento.
     """
     body_bytes = await request.body()
@@ -91,7 +91,7 @@ async def receive_integromat_webhook(request: Request, x_signature: Optional[str
         # Registrar aprobación en la base de datos y otorgar acceso al archivo
         return {
             "status": "success",
-            "message": f"Trabajo {trabajo_id} aprobado con éxito por Jhon Zapata. Descarga liberada.",
+            "message": f"Trabajo {trabajo_id} aprobado con éxito por el Administrador. Descarga liberada.",
             "unlocked": True
         }
     elif action == "REJECT":
