@@ -601,72 +601,107 @@
     </button>
   </div>
 
-  <!-- MODAL DE AUTENTICACIÓN / REGISTRO ANÓNIMO CON ALIAS -->
+  <!-- MODAL DE AUTENTICACIÓN / REGISTRO PROFESIONAL ESTÁNDAR MUNDIAL (ZERO SCROLL) -->
   <div class="wompi-modal-overlay" id="modal-auth" style="display: none;">
-    <div class="wompi-modal-card" style="max-width: 420px;">
+    <div class="wompi-modal-card auth-modal-box">
+      
+      <!-- HEADER CON BADGE Y BOTÓN CERRAR -->
       <div class="modal-card-header">
         <div class="modal-header-brand">
-          <span class="wompi-modal-pill" id="auth-modal-pill">Privacidad Blindada</span>
-          <h3 id="auth-modal-title">Acceso Estudiante</h3>
+          <span class="auth-pill-secure">🔒 Privacidad y Asignación Directa</span>
+          <h3 id="auth-modal-title">Acceso a AcademicPro</h3>
         </div>
-        <button class="btn-close-modal" onclick="closeAuthModal()">&times;</button>
+        <button class="btn-close-modal" onclick="closeAuthModal()" title="Cerrar">&times;</button>
       </div>
 
-      <p class="modal-intro-text" style="font-size: 11.5px; color: #94A3B8; margin-bottom: 12px;">
-        🛡️ <b>100% Anónimo:</b> No solicitamos tu nombre real. Usa un alias o seudónimo para que nadie sepa que usas asistencia técnica.
-      </p>
-
-      <!-- TABS LOGIN / REGISTRO -->
-      <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #334155; padding-bottom: 8px;">
-        <button id="tab-btn-login" type="button" onclick="switchAuthMode('login')" style="flex: 1; background: transparent; border: none; color: #10B981; font-weight: 800; font-size: 13px; cursor: pointer; padding: 6px 0; border-bottom: 2px solid #10B981;">
+      <!-- SEGMENTED CONTROL TABS (ESTÁNDAR APPLE / LINEAR) -->
+      <div class="auth-segmented-tabs">
+        <button id="tab-btn-login" type="button" class="auth-tab-btn active" onclick="switchAuthMode('login')">
           Iniciar Sesión
         </button>
-        <button id="tab-btn-register" type="button" onclick="switchAuthMode('register')" style="flex: 1; background: transparent; border: none; color: #94A3B8; font-weight: 700; font-size: 13px; cursor: pointer; padding: 6px 0; border-bottom: 2px solid transparent;">
-          Crear Cuenta (+2 Créditos Gratis)
+        <button id="tab-btn-register" type="button" class="auth-tab-btn" onclick="switchAuthMode('register')">
+          Registrarse (+2 Créditos)
         </button>
       </div>
 
-      <form id="auth-form" onsubmit="handleAuthSubmit(event)">
-        <!-- CAMPO ALIAS (SOLO REGISTRO) -->
-        <div id="field-auth-alias" style="display: none; margin-bottom: 12px;">
-          <label style="font-size: 11px; font-weight: 700; color: #CBD5E1; display: block; margin-bottom: 4px;">ALIAS / SEUDÓNIMO:</label>
-          <input type="text" id="auth-alias-input" placeholder="Ej: TesisMaster2026, EstudiantePro" style="width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 8px; color: #FFF; font-size: 13px;" />
+      <!-- PANEL 1: INICIAR SESIÓN (PARA USUARIOS REGISTRADOS) -->
+      <div id="panel-login" class="auth-panel-view">
+        <p class="auth-panel-intro">
+          Ingresa con tu correo y contraseña registrados para acceder a tus créditos y trabajos guardados.
+        </p>
+
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+          <div class="auth-input-group">
+            <label for="auth-email-input">CORREO ELECTRÓNICO:</label>
+            <input type="email" id="auth-email-input" required placeholder="tu_correo@ejemplo.com" />
+          </div>
+
+          <div class="auth-input-group">
+            <label for="auth-pwd-input">CONTRASEÑA:</label>
+            <input type="password" id="auth-pwd-input" required placeholder="••••••••" />
+          </div>
+
+          <button type="submit" id="auth-submit-btn" class="btn-auth-submit">
+            Entrar a AcademicPro
+          </button>
+
+          <p id="auth-msg-feedback" class="auth-feedback-text"></p>
+        </form>
+
+        <div class="auth-switch-prompt">
+          <span>¿Aún no tienes cuenta activa?</span>
+          <button type="button" onclick="switchAuthMode('register')" class="auth-link-btn">Regístrate con Jhon Zapata</button>
+        </div>
+      </div>
+
+      <!-- PANEL 2: REGISTRO DIRECTO EXCLUSIVO CON EL NÚMERO DE JHON ZAPATA -->
+      <div id="panel-register" class="auth-panel-view" style="display: none;">
+        <div class="register-whatsapp-card">
+          <div class="wa-card-top">
+            <span class="wa-verified-pill">🛡️ Asignación Directa y Segura</span>
+            <h4>Registro y Activación de Cuenta</h4>
+            <p>
+              Para garantizar tu confidencialidad absoluta y evitar cuentas duplicadas, el registro y la asignación de tus <b>2 Créditos Gratuitos</b> se realiza directamente con Jhon Zapata:
+            </p>
+          </div>
+
+          <div class="wa-highlight-box">
+            <div class="wa-user-avatar">JZ</div>
+            <div class="wa-user-details">
+              <span class="wa-role-tag">Atención Personalizada</span>
+              <strong class="wa-phone-text">+57 320 710 5618</strong>
+              <span class="wa-status-text">🟢 Disponible en WhatsApp para tu registro</span>
+            </div>
+          </div>
+
+          <a href="https://wa.me/573207105618?text=Hola%20Jhon,%20deseo%20registrarme%20en%20AcademicPro%20y%20activar%20mis%20cr%C3%A9ditos%20de%20bienvenida%20para%20mi%20trabajo" 
+             target="_blank" 
+             class="btn-whatsapp-register">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+            </svg>
+            <span>Solicitar Registro por WhatsApp (+57 320 710 5618)</span>
+          </a>
+
+          <div class="wa-perks-list">
+            <div class="wa-perk-item">✓ Activación inmediata de 2 créditos de bienvenida</div>
+            <div class="wa-perk-item">✓ Asesoría 100% confidencial para tus entregas académicas</div>
+          </div>
         </div>
 
-        <!-- CAMPO INSTITUCIÓN (SOLO REGISTRO) -->
-        <div id="field-auth-inst" style="display: none; margin-bottom: 12px;">
-          <label style="font-size: 11px; font-weight: 700; color: #CBD5E1; display: block; margin-bottom: 4px;">INSTITUCIÓN EDUCATIVA:</label>
-          <select id="auth-inst-select" style="width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 8px; color: #FFF; font-size: 13px;">
-            <option value="UNAD">UNAD (Universidad Nacional Abierta y a Distancia)</option>
-            <option value="SENA">SENA (Servicio Nacional de Aprendizaje)</option>
-            <option value="OTRA">Otra Universidad / Instituto</option>
-          </select>
+        <div class="auth-switch-prompt">
+          <span>¿Ya tienes tus accesos?</span>
+          <button type="button" onclick="switchAuthMode('login')" class="auth-link-btn">Iniciar Sesión aquí</button>
         </div>
+      </div>
 
-        <!-- CAMPO CORREO -->
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 11px; font-weight: 700; color: #CBD5E1; display: block; margin-bottom: 4px;">CORREO ELECTRÓNICO:</label>
-          <input type="email" id="auth-email-input" required placeholder="tu_correo@ejemplo.com" style="width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 8px; color: #FFF; font-size: 13px;" />
-        </div>
-
-        <!-- CAMPO CONTRASEÑA -->
-        <div style="margin-bottom: 16px;">
-          <label style="font-size: 11px; font-weight: 700; color: #CBD5E1; display: block; margin-bottom: 4px;">CONTRASEÑA:</label>
-          <input type="password" id="auth-pwd-input" required placeholder="••••••••" style="width: 100%; padding: 10px; background: #0F172A; border: 1px solid #334155; border-radius: 8px; color: #FFF; font-size: 13px;" />
-        </div>
-
-        <button type="submit" id="auth-submit-btn" style="width: 100%; background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: #FFFFFF; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
-          Entrar a AcademicPro
-        </button>
-
-        <p id="auth-msg-feedback" style="font-size: 11px; margin-top: 10px; text-align: center; display: none;"></p>
-      </form>
-
-      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center;">
-        <a href="/admin" target="_blank" style="font-size: 11px; color: #94A3B8; text-decoration: none;">
+      <!-- FOOTER DISCRETO -->
+      <div class="auth-modal-footer">
+        <a href="/admin" target="_blank" class="auth-admin-link">
           🔐 Acceso Administrador (Jhon Zapata)
         </a>
       </div>
+
     </div>
   </div>
 

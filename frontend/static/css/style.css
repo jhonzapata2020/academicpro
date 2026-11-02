@@ -1878,3 +1878,297 @@ body.wompi-theme {
     width: 100%;
   }
 }
+
+/* =========================================================================
+   MODAL DE ACCESO Y REGISTRO ESTÁNDAR GLOBAL (ZERO SCROLLBAR)
+   ========================================================================= */
+#modal-auth .wompi-modal-card.auth-modal-box {
+  background: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 20px !important;
+  max-width: 440px !important;
+  width: 92% !important;
+  padding: 24px 26px !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  max-height: 94vh !important;
+  overflow: hidden !important; /* Elimina completamente la barra vertical fea */
+}
+
+/* Ocultar barra en cualquier motor de renderizado si llegara a desbordar */
+#modal-auth .wompi-modal-card::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+#modal-auth .wompi-modal-card {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.auth-pill-secure {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 4px;
+}
+
+/* Segmented Control Tabs (Estilo Apple / Linear) */
+.auth-segmented-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-weight: 700;
+  font-size: 12.5px;
+  padding: 8px 0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-tab-btn:hover {
+  color: #FFFFFF;
+}
+
+.auth-tab-btn.active {
+  background: #1E293B;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-panel-intro {
+  font-size: 12px;
+  color: #94A3B8;
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+.auth-input-group {
+  margin-bottom: 12px;
+}
+
+.auth-input-group label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #CBD5E1;
+  display: block;
+  margin-bottom: 5px;
+  letter-spacing: 0.3px;
+}
+
+.auth-input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0B1120;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 13px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.auth-input-group input:focus {
+  outline: none;
+  border-color: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.btn-auth-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  color: #FFFFFF;
+  border: none;
+  padding: 11px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  transition: all 0.2s ease;
+  margin-top: 4px;
+}
+
+.btn-auth-submit:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+  transform: translateY(-1px);
+}
+
+.auth-feedback-text {
+  font-size: 11.5px;
+  margin-top: 10px;
+  text-align: center;
+  display: none;
+}
+
+.auth-switch-prompt {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 11.5px;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.auth-link-btn {
+  background: transparent;
+  border: none;
+  color: #38BDF8;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* Panel de Registro por WhatsApp (Solo con el número de Jhon Zapata) */
+.register-whatsapp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wa-card-top .wa-verified-pill {
+  display: inline-block;
+  background: rgba(37, 211, 102, 0.15);
+  color: #25D366;
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.wa-card-top h4 {
+  font-size: 14px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+
+.wa-card-top p {
+  font-size: 11.5px;
+  color: #94A3B8;
+  line-height: 1.45;
+}
+
+.wa-highlight-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.wa-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #10B981);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wa-user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wa-role-tag {
+  font-size: 10px;
+  color: #94A3B8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wa-phone-text {
+  font-size: 15px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.5px;
+}
+
+.wa-status-text {
+  font-size: 10.5px;
+  color: #25D366;
+}
+
+.btn-whatsapp-register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #25D366;
+  color: #0B1120;
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-whatsapp-register:hover {
+  background: #20BA5A;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.4);
+}
+
+.wa-perks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: #94A3B8;
+}
+
+.auth-modal-footer {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.auth-admin-link {
+  font-size: 11px;
+  color: #64748B;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-admin-link:hover {
+  color: #38BDF8;
+}

@@ -727,36 +727,21 @@ function switchAuthMode(mode) {
   currentAuthMode = mode;
   const tabLogin = document.getElementById("tab-btn-login");
   const tabRegister = document.getElementById("tab-btn-register");
-  const fieldAlias = document.getElementById("field-auth-alias");
-  const fieldInst = document.getElementById("field-auth-inst");
-  const submitBtn = document.getElementById("auth-submit-btn");
+  const panelLogin = document.getElementById("panel-login");
+  const panelRegister = document.getElementById("panel-register");
   const title = document.getElementById("auth-modal-title");
 
   if (mode === "register") {
-    if (tabRegister) {
-      tabRegister.style.color = "#10B981";
-      tabRegister.style.borderBottomColor = "#10B981";
-    }
-    if (tabLogin) {
-      tabLogin.style.color = "#94A3B8";
-      tabLogin.style.borderBottomColor = "transparent";
-    }
-    if (fieldAlias) fieldAlias.style.display = "block";
-    if (fieldInst) fieldInst.style.display = "block";
-    if (submitBtn) submitBtn.textContent = "Crear Cuenta (+2 Créditos Gratis)";
-    if (title) title.textContent = "Registro Anónimo";
+    if (tabRegister) tabRegister.classList.add("active");
+    if (tabLogin) tabLogin.classList.remove("active");
+    if (panelLogin) panelLogin.style.display = "none";
+    if (panelRegister) panelRegister.style.display = "block";
+    if (title) title.textContent = "Registro y Activación";
   } else {
-    if (tabLogin) {
-      tabLogin.style.color = "#10B981";
-      tabLogin.style.borderBottomColor = "#10B981";
-    }
-    if (tabRegister) {
-      tabRegister.style.color = "#94A3B8";
-      tabRegister.style.borderBottomColor = "transparent";
-    }
-    if (fieldAlias) fieldAlias.style.display = "none";
-    if (fieldInst) fieldInst.style.display = "none";
-    if (submitBtn) submitBtn.textContent = "Entrar a AcademicPro";
+    if (tabLogin) tabLogin.classList.add("active");
+    if (tabRegister) tabRegister.classList.remove("active");
+    if (panelLogin) panelLogin.style.display = "block";
+    if (panelRegister) panelRegister.style.display = "none";
     if (title) title.textContent = "Acceso Estudiante";
   }
 }
